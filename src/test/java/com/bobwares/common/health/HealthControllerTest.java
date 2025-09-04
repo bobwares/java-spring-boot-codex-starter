@@ -1,3 +1,15 @@
+/**
+ * App: common
+ * Package: com.bobwares.common.health
+ * File: HealthControllerTest.java
+ * Version: 0.1.0
+ * Author: AI
+ * Date: 2025-09-04T22:11:01Z
+ * Exports: HealthControllerTest, healthEndpointReturnsStatusUp
+ * Description: Integration tests for the HealthController.
+ *              healthEndpointReturnsStatusUp: verifies /health returns UP.
+ */
+
 package com.bobwares.common.health;
 
 import org.junit.jupiter.api.Test;
