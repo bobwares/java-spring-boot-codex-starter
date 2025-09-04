@@ -13,6 +13,7 @@ document each turn.
 ## Metadata Header
 
 — Every source, test, and IAC file must begin with Metadata Header comment section.
+- exclude pom.xml
 - Placement: Top of file, above any import or code statements.
 - Version: Increment only when the file contents change.
 - Date: UTC timestamp of the most recent change.
