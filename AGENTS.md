@@ -1,20 +1,16 @@
-# tasks
+# Turns
 
-- update missing meta data headers.
-- add Makefile
+document each turn.
 
-
-# Pipeline
-- Create new entry in ./ai/history for each turn.
-- Create entry in ./ai/version for each turn.
-- execute tasks
+- update the turn number : initial value 0
+- current turn directory: create directory ./ai/turns/{{turn # }}
+- create the changelog in the current turn directory.
+- create the ADR for the turn in the current turn directory.
 
 # Coding Standards
 
-## RULES
 
-
-### Metadata Header
+## Metadata Header
 
 — Every source, test, and IAC file must begin with Metadata Header comment section.
 - Placement: Top of file, above any import or code statements.
@@ -29,6 +25,7 @@
       * Package: {{package}}
       * File: {{file name}}
       * Version: semantic versioning starting at 0.1.0
+      * Turn #: {{turn number}}
       * Author: {{author}}
       * Date: {{YYYY-MM-DDThh:mm:ssZ}}
       * Exports: {{ exported functions, types, and variables.}}
@@ -40,15 +37,25 @@
 ## Versioning Rules
 
       * Use **semantic versioning** (`MAJOR.MINOR.PATCH`).
-      * Track changes each “AI turn” in `project_root/changelog.md`.
       * Start at **0.1.0**; update only when code or configuration changes.
       * Record only the sections that changed.
 
-    ```markdown
-    # Version History
+
+## Change Log
+
+- Track changes each “AI turn” in: project_root/ai/turns/current turn directory/changelog.md
+- append changes to project_root/changelog.md
+
+
+
+    # Turn 
     
-    ### 0.0.1 – 2025-06-08 06:58:24 UTC (main)
+    ### {{turn number}}  – 2025-06-08 06:58:24 UTC (main)
     
+    ## prompt
+
+    {{ input prompt}}
+
     #### Task
     <Task>
     
@@ -70,7 +77,7 @@
 
 ### Purpose
 
-The `/adr` folder captures **concise, high-signal Architecture Decision Records** whenever the
+The adr.md` folder captures **concise, high-signal Architecture Decision Records** whenever the
 AI coding agent (or a human) makes a non-obvious technical or architectural choice.
 Storing ADRs keeps the project’s architectural rationale transparent and allows reviewers to
 understand **why** a particular path was taken without trawling through commit history or code
@@ -78,9 +85,8 @@ comments.
 
 ### Location
 
-```
-project_root/adr/
-```
+    project_root/ai/turns/current turn directory/adr.md
+
 
 ### When the Agent Must Create an ADR
 
