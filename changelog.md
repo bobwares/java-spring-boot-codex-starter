@@ -20,3 +20,14 @@ Update metadata headers and add Makefile
 - Added metadata headers to source, test, and configuration files.
 - Introduced Makefile for build and test commands.
 - Created changelog to track version history.
+
+### 0.0.3 – 2025-09-04 23:36:59 UTC (main)
+
+#### Task
+Add asynchronous person CRUD endpoints.
+
+#### Changes
+- Introduced reactive Person controller and service.
+- Added data model with validation annotations.
+- Created integration tests for person endpoints.
+- Fixed pom.xml metadata header for Maven parsing.
