@@ -4,6 +4,7 @@
 
 open and read file project_root/ai/Turns - Technical Design.md
 
+# Coding Standards
 
 ## Metadata Header
 
@@ -36,17 +37,16 @@ open and read file project_root/ai/Turns - Technical Design.md
       * Start at **0.1.0**; update only when code or configuration changes.
       * Update the version in the source file if it is updated during a turn.
 
+# Logging
 
 ## Change Log
 
-- Track changes each “AI turn” in: project_root/ai/turns/current turn directory/changelog.md
+- Track changes each “AI turn” in: project_root/ai/agentic-pipeline/turns/current turn directory/changelog.md
 - append changes to project change log located project_root/changelog.md
 
 ### Change Log Entry Template
 
-    # Turn 
-    
-    ### {{turn number}}  – {{Date Time of execution}}
+    # Turn: {{turn number}}  – {{Date Time of execution}}
     
     ## prompt
 
@@ -67,7 +67,7 @@ open and read file project_root/ai/Turns - Technical Design.md
     - Add tsconfig for ui and api.
     - Create src directories with unit-test folders.
     - Add e2e test directory for Playwright.
-    ```
+   
 
 ## ADR (Architecture Decision Record)
 
@@ -81,7 +81,7 @@ comments.
 
 ### Location
 
-    project_root/ai/turns/current turn directory/adr.md
+    project_root/ai/agentic-pipeline/turns/current turn directory/adr.md
 
 
 ### When the Agent Must Create an ADR
@@ -94,17 +94,6 @@ comments.
 | Changing a cross-cutting concern                             | Switching error-handling strategy to functional `Result` types                                                                                                                                                                                                         | **Yes**   |
 | Cosmetic or trivial change                                   | Renaming a variable                                                                                                                                                                                                                                                    | **Yes**   |
 
-### Naming Convention
-
-```
-adr/YYYYMMDDnnn_<slugified-title>.md
-```
-
-* `YYYYMMDD` – calendar date in UTC
-* `nnn` – zero-padded sequence number for that day
-* `slugified-title` – short, lowercase, hyphen-separated summary
-
-Example: `adr/20250611_001_use-prisma-for-orm.md`.
 
 ### Minimal ADR Template
 
