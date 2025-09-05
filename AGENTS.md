@@ -1,13 +1,8 @@
+
+
 # Turns
 
-document each turn.
-
-- update the turn number : initial value 0
-- current turn directory: create directory ./ai/turns/{{turn # }}
-- create the changelog in the current turn directory.
-- create the ADR for the turn in the current turn directory.
-
-# Coding Standards
+open and read file project_root/ai/Turns - Technical Design.md
 
 
 ## Metadata Header
@@ -19,14 +14,14 @@ document each turn.
 - Date: UTC timestamp of the most recent change.
 
 
-- Template
+### Metadata Header Template
     ```markdown
       /**
       * App: {{Application Name}}
       * Package: {{package}}
       * File: {{file name}}
       * Version: semantic versioning starting at 0.1.0
-      * Turn #: {{turn number}}
+      * Turns: append {{turn number}} list when created or updated.
       * Author: {{author}}
       * Date: {{YYYY-MM-DDThh:mm:ssZ}}
       * Exports: {{ exported functions, types, and variables.}}
@@ -35,23 +30,23 @@ document each turn.
       */
     ````
 
-## Versioning Rules
+### Source Versioning Rules
 
       * Use **semantic versioning** (`MAJOR.MINOR.PATCH`).
       * Start at **0.1.0**; update only when code or configuration changes.
-      * Record only the sections that changed.
+      * Update the version in the source file if it is updated during a turn.
 
 
 ## Change Log
 
 - Track changes each “AI turn” in: project_root/ai/turns/current turn directory/changelog.md
-- append changes to project_root/changelog.md
+- append changes to project change log located project_root/changelog.md
 
-
+### Change Log Entry Template
 
     # Turn 
     
-    ### {{turn number}}  – 2025-06-08 06:58:24 UTC (main)
+    ### {{turn number}}  – {{Date Time of execution}}
     
     ## prompt
 
@@ -93,7 +88,7 @@ comments.
 
 | Scenario                                                     | Example                                                                                                                                                                                                                                                                | Required? |
 |--------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
-| Summarize Chain of Thought reasoning for the task           | Documenting the decision flow: ① capture requirements for a low-latency, pay-per-request CRUD API → ② compare DynamoDB single-table vs. Aurora Serverless → ③ choose DynamoDB single-table with GSI on email for predictable access patterns and minimal ops overhead. | **Yes**   |
+| Summarize Chain of Thought reasoning for the task            | Documenting the decision flow: ① capture requirements for a low-latency, pay-per-request CRUD API → ② compare DynamoDB single-table vs. Aurora Serverless → ③ choose DynamoDB single-table with GSI on email for predictable access patterns and minimal ops overhead. | **Yes**   |
 | Selecting one library or pattern over plausible alternatives | Choosing Prisma instead of TypeORM                                                                                                                                                                                                                                     | **Yes**   |
 | Introducing a new directory or module layout                 | Splitting `customer` domain into bounded contexts                                                                                                                                                                                                                      | **Yes**   |
 | Changing a cross-cutting concern                             | Switching error-handling strategy to functional `Result` types                                                                                                                                                                                                         | **Yes**   |
