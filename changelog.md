@@ -20,3 +20,15 @@ Update metadata headers and add Makefile
 - Added metadata headers to source, test, and configuration files.
 - Introduced Makefile for build and test commands.
 - Created changelog to track version history.
+
+### 0.0.3 – 2025-09-05 19:46:19 UTC (main)
+
+#### Task
+Implement WebFlux async CRUD for Person
+
+#### Changes
+- Added WebFlux CRUD endpoints, domain records, service, exception, and controller.
+- Added unit and integration tests.
+- Added e2e HTTP scenario for Person.
+- Added OpenAPI dependency for documentation.
+- Updated version history.

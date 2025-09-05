@@ -1,0 +1,46 @@
+# App: common
+# Package: e2e
+# File: person.http
+# Version: 0.1.0
+# Turns: 1
+# Author: Codex Agent
+# Date: 2025-09-05T19:46:19Z
+# Exports: E2E CRUD scenario for Person API
+# Description: Demonstrates create, read, update, delete operations for the Person API using HTTP requests.
+
+@host = http://localhost:8080
+
+### Create person
+POST {{host}}/api/persons
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "city": "Boston",
+  "state": "MA",
+  "zip": "02115"
+}
+
+> {% client.global.set("id", response.body.id); %}
+
+### Get person
+GET {{host}}/api/persons/{{id}}
+
+### Update person
+PUT {{host}}/api/persons/{{id}}
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "city": "Cambridge",
+  "state": "MA",
+  "zip": "02139"
+}
+
+### Delete person
+DELETE {{host}}/api/persons/{{id}}
+
+### Get after delete (expect 404)
+GET {{host}}/api/persons/{{id}}
