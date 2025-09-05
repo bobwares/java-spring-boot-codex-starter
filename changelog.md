@@ -20,3 +20,13 @@ Update metadata headers and add Makefile
 - Added metadata headers to source, test, and configuration files.
 - Introduced Makefile for build and test commands.
 - Created changelog to track version history.
+
+### 0.0.3 – 2025-09-05 23:11:56 UTC (work)
+
+#### Task
+Create Person CRUD REST service.
+
+#### Changes
+- Added person WebFlux CRUD API with OpenAPI documentation.
+- Added unit and integration tests for person endpoints.
+- Added person.e2e HTTP scenario and springdoc dependency.

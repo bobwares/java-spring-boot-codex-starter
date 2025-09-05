@@ -1,0 +1,47 @@
+# App: Person CRUD Service
+# Package: e2e
+# File: person.http
+# Version: 0.1.0
+# Turns: 1
+# Author: Codex Agent
+# Date: 2025-09-05T23:11:56Z
+# Exports: create, read, update, delete
+# Description: End-to-end HTTP scenario exercising Person CRUD lifecycle.
+
+@host = http://localhost:8080
+
+### Create person
+POST {{host}}/api/persons
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "city": "Springfield",
+  "state": "IL",
+  "zip": "62704"
+}
+
+> {% client.global.set("personId", response.body.id); %}
+
+### Get person
+GET {{host}}/api/persons/{{personId}}
+
+### Update person
+PUT {{host}}/api/persons/{{personId}}
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "city": "Springfield",
+  "state": "IL",
+  "zip": "62704"
+}
+
+### Delete person
+DELETE {{host}}/api/persons/{{personId}}
+
+### Verify deletion
+GET {{host}}/api/persons/{{personId}}
+

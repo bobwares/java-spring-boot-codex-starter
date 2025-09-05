@@ -1,12 +1,13 @@
-# App: common
+# App: Person CRUD Service
 # Package: configuration
 # File: application.yml
-# Version: 0.1.0
-# Author: AI
-# Date: 2025-09-04T22:11:01Z
+# Version: 0.1.1
+# Turns: 1
+# Author: Codex Agent
+# Date: 2025-09-05T23:11:56Z
 # Exports: spring.application.name
 # Description: Configures the Spring Boot application name.
 
 spring:
   application:
-    name: common
+    name: person-crud-service
