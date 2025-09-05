@@ -4,4 +4,4 @@ Inputs
 - API Request Schema: project_root/schemas/person.schema.json
 - Package root: com.bobwares.registration
 - Project name: Person CRUD Service
-- Version seed: `0.1.0`
+- Version seed: 0.1.0
