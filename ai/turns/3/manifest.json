@@ -1,0 +1,18 @@
+{
+  "turnId": 3,
+  "timestampUtc": "2025-09-05T18:22:48Z",
+  "files": [
+    "src/main/java/com/bobwares/registration/RegistrationApplication.java",
+    "src/main/java/com/bobwares/registration/PersonRequest.java",
+    "src/main/java/com/bobwares/registration/Person.java",
+    "src/main/java/com/bobwares/registration/PersonService.java",
+    "src/main/java/com/bobwares/registration/PersonNotFoundException.java",
+    "src/main/java/com/bobwares/registration/PersonController.java",
+    "src/test/java/com/bobwares/registration/PersonControllerTest.java",
+    "changelog.md",
+    "ai/turns/3/changelog.md",
+    "ai/turns/3/adr.md",
+    "ai/turns/3/manifest.json",
+    "ai/turns/index.csv"
+  ]
+}

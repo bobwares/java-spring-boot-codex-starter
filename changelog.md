@@ -20,3 +20,12 @@ Update metadata headers and add Makefile
 - Added metadata headers to source, test, and configuration files.
 - Introduced Makefile for build and test commands.
 - Created changelog to track version history.
+
+### 0.0.3 – 2025-09-05 18:22:48 UTC (main)
+
+#### Task
+Add asynchronous person registration endpoints.
+
+#### Changes
+- Added person domain, service, controller, and in-memory persistence.
+- Implemented integration test for person lifecycle.
