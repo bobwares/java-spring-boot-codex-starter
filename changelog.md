@@ -20,3 +20,13 @@ Update metadata headers and add Makefile
 - Added metadata headers to source, test, and configuration files.
 - Introduced Makefile for build and test commands.
 - Created changelog to track version history.
+
+### 0.0.3 – 2025-09-06 02:28:22 UTC (work)
+
+#### Task
+Add Person CRUD service
+
+#### Changes
+- Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
+- Add unit and integration tests for Person service and controller.
+- Provide end-to-end HTTP scenario for Person lifecycle.
