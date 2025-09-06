@@ -2,7 +2,7 @@
 
 # Turns
 
-open and read file project_root/ai/Turns - Technical Design.md
+open and read file project_root/ai/Turns_Technical_Design.md
 
 # Coding Standards
 
@@ -113,3 +113,37 @@ State the choice that was made.
 **Consequences**  
 List the trade-offs and implications (positive and negative).  
 ```
+
+Understood. Here’s the finalized **AGENTS.md snippet** with the `codex/turn-{{turn-id}}` naming convention:
+
+---
+
+# Branch Naming Convention
+
+Each Codex **turn** must create a new Git branch at the start of execution. The branch name format is:
+
+```
+codex/turn-{{turn-id}}
+```
+
+Where:
+
+* `codex/turn-` is the fixed prefix.
+* `{{turn-id}}` is the integer identifier for the turn, incremented by 1 at the start of each turn.
+
+### Rules
+
+1. The `{{turn-id}}` must match the ID recorded in `/turns/index.csv`.
+2. The branch must be created before any artifacts are committed.
+3. All commits for the duration of the turn must go to this branch.
+4. The branch name must be logged in both the turn’s **changelog** and the **Architecture Decision Record (ADR)**.
+5. At the end of the turn, the branch may be merged via PR in line with repository policy.
+
+### Example
+
+* Turn ID: `12`
+* Resulting branch:
+
+  ```
+  codex/turn-12
+  ```

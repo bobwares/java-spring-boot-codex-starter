@@ -28,7 +28,7 @@ You are an expert Java Spring Boot engineer. Implement asynchronous CRUD endpoin
 - OpenAPI via springdoc for WebFlux.
 - No database dependency; use `ConcurrentHashMap<UUID, Person>`.
 - JSON field names use snake\_case; map to Java record fields.
-
+- services should be annotated @Service.
 
 ## Deliverables (create or update)
 

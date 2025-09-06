@@ -14,7 +14,7 @@
 ## Repository layout
 
 ```
-/ai/turns/
+/ai/agentic-pipeline/turns/
   1/
     manifest.json
     changelog.md
