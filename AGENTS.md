@@ -2,7 +2,7 @@
 
 # Turns
 
-open and read file project_root/ai/Turns_Technical_Design.md
+open and read file project_root/ai/docs/Turns_Technical_Design.md
 
 # Coding Standards
 
