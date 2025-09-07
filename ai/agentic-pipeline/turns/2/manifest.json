@@ -1,0 +1,20 @@
+{
+  "turnId": 2,
+  "timestampUtc": "2025-09-07T15:17:22Z",
+  "task": "create_sql_dll_from_schema",
+  "changes": {
+    "added": [
+      "db/README.md",
+      "db/migrations/01_customer_profile_tables.sql",
+      "db/scripts/customer_test_data.sql",
+      "ai/agentic-pipeline/turns/2/changelog.md",
+      "ai/agentic-pipeline/turns/2/adr.md",
+      "ai/agentic-pipeline/turns/2/manifest.json"
+    ],
+    "modified": [
+      "changelog.md",
+      "turns/index.csv"
+    ],
+    "deleted": []
+  }
+}

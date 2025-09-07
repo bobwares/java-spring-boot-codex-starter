@@ -30,3 +30,13 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-07 15:17:30 UTC (work)
+
+#### Task
+Generate SQL DDL and test data for Customer schema
+
+#### Changes
+- Added normalized PostgreSQL migration and view for customer profile.
+- Seeded sample customer data with addresses, privacy settings, emails, and phone numbers.
+- Documented migration execution in db/README.md.
