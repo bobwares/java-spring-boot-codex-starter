@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "<repo-root>/entity-specs/person-entities.json",
+  "title": "person Domain Entities",
+  "type": "object",
+  "x-db": { "schema": "person" },
+  "definitions": {
+    "Person": {
+      "type": "object",
+      "properties": {
+        "person_id": { "type": "integer" },
+        "first_name": { "type": "string", "maxLength": 255 },
+        "last_name": { "type": "string", "maxLength": 255 },
+        "city": { "type": "string", "maxLength": 255 },
+        "state": { "type": "string", "minLength": 2, "maxLength": 2 },
+        "zip": { "type": "string", "maxLength": 10 }
+      },
+      "required": ["person_id", "first_name", "last_name", "city", "state", "zip"],
+      "x-db": {
+        "primaryKey": ["person_id"],
+        "foreignKey": [],
+        "unique": [],
+        "indexes": []
+      }
+    }
+  }
+}

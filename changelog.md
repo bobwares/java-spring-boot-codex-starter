@@ -30,3 +30,13 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-07 01:22:38 UTC (work)
+
+#### Task
+Generate normalized Person tables and test data
+
+#### Changes
+- Add SQL migration for Person table.
+- Generate JSON entity spec from migration.
+- Add test data script for Person.

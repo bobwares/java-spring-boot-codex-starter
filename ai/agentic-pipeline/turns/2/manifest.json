@@ -1,0 +1,21 @@
+{
+  "turnId": 2,
+  "timestampUtc": "2025-09-07T01:22:38Z",
+  "task": "create-sql-dll-from-schema",
+  "changes": {
+    "added": [
+      "db/migrations/01_person.sql",
+      "db/entity-specs/person-entities.json",
+      "db/scripts/person_test_data.sql",
+      "ai/agentic-pipeline/turns/2/changelog.md",
+      "ai/agentic-pipeline/turns/2/adr.md",
+      "ai/agentic-pipeline/turns/2/manifest.json",
+      "ai/agentic-pipeline/turns/2/prompt-turn-2.md"
+    ],
+    "modified": [
+      "changelog.md",
+      "turns/index.csv"
+    ],
+    "deleted": []
+  }
+}
