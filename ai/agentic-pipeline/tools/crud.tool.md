@@ -23,7 +23,7 @@ You are an expert Java Spring Boot engineer. Implement asynchronous CRUD endpoin
 - Version seed: `0.1.0`
 
 ## Non-functional Constraints
-
+- create interfaces for services
 - Java 21, Spring Boot 3.5.x, WebFlux.
 - OpenAPI via springdoc for WebFlux.
 - No database dependency; use `ConcurrentHashMap<UUID, Person>`.

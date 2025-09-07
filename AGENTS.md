@@ -1,8 +1,14 @@
+# About
 
+open and read file project_root/ai/agentic-pipeline/context/About.md
 
 # Turns
 
-open and read file project_root/ai/docs/Turns_Technical_Design.md
+open and read file project_root/ai/agentic-pipeline/context/Turns_Technical_Design.md
+
+# Tech Stack
+
+open and read file project_root/ai/agentic-pipeline/context/Turns_Technical_Design.md
 
 # Coding Standards
 
@@ -26,7 +32,7 @@ open and read file project_root/ai/docs/Turns_Technical_Design.md
       * Author: {{author}}
       * Date: {{YYYY-MM-DDThh:mm:ssZ}}
       * Exports: {{ exported functions, types, and variables.}}
-      * Description: Level-5 documentation of the class or function. Document each
+      * Description: documentate the function of the class or function. Document each
       *              method or function in the file.
       */
     ````

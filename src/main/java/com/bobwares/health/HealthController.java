@@ -10,7 +10,7 @@
  *              health: returns a constant UP status map.
  */
 
-package com.bobwares.common.health;
+package com.bobwares.health;
 
 import java.util.Map;
 

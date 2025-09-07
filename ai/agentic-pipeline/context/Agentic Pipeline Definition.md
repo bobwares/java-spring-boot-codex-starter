@@ -54,17 +54,17 @@ Key features:
 ## Repository Layout
 
 ```
-/AGENTS.md
-/tasks/
+project root/AGENTS.md
+project root/ai/tasks/
   person-crud-tool.prompt.md
   task.schema.json
   task.person-crud.yaml
-/tools/
+project root/ai/tools/
   sql-ddl.prompt.md
   test-data.prompt.md
   e2e-http.prompt.md
   openapi-annotate.prompt.md
-/turns/
+project root/ai/turns/
   index.csv
   2025-09-05T183000Z_turn-004/
     inputs/
@@ -75,7 +75,7 @@ agentic/
   context.schema.json
   tool.schema.json
   pipeline.config.yaml
-version.md
+
 ```
 
 ---
@@ -94,8 +94,6 @@ All source code, config, and prompt files must include a **metadata header**:
 # Exports: {main classes, functions, or artifacts}
 # Description: {purpose of this file}
 ```
-
-Updates must also be recorded in `version.md`.
 
 ---
 

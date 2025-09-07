@@ -1,4 +1,4 @@
-## Project Overview
+## About
 * 
 * **Name**: `java-spring-boot-codex-starter`
 * **Version**: `0.1.0`
