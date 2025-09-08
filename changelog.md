@@ -30,3 +30,14 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-08 05:07:24 UTC (work)
+
+#### Task
+Configure PostgreSQL environment and Spring profiles
+
+#### Changes
+- Add Docker Compose Postgres service and .env example.
+- Configure Spring Boot datasource and profiles.
+- Update Maven build for Testcontainers.
+- Document local database usage.

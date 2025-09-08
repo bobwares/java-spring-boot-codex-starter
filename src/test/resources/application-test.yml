@@ -1,0 +1,16 @@
+####################################################################################################
+# App: Customer Registration Service
+# Package: configuration
+# File: application-test.yml
+# Version: 0.1.0
+# Turns: 2
+# Author: AI
+# Date: 2025-09-08T05:07:24Z
+# Exports: spring.jpa.hibernate.ddl-auto
+# Description: Test profile settings.
+####################################################################################################
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update

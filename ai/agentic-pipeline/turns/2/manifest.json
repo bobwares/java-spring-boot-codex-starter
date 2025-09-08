@@ -1,0 +1,25 @@
+{
+  "turnId": 2,
+  "timestampUtc": "2025-09-08T05:07:24Z",
+  "task": "postgres-environment",
+  "changes": {
+    "added": [
+      ".env.example",
+      "README.md",
+      "ai/agentic-pipeline/turns/2/changelog.md",
+      "ai/agentic-pipeline/turns/2/adr.md",
+      "ai/agentic-pipeline/turns/2/manifest.json",
+      "src/main/resources/application-local.yml",
+      "src/test/resources/application-test.yml"
+    ],
+    "modified": [
+      ".gitignore",
+      "changelog.md",
+      "docker-compose.yml",
+      "pom.xml",
+      "src/main/resources/application.yml",
+      "turns/index.csv"
+    ],
+    "deleted": []
+  }
+}

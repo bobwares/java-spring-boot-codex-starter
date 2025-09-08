@@ -1,19 +1,31 @@
+####################################################################################################
+# App: Customer Registration Service
+# Package: infrastructure
+# File: docker-compose.yml
+# Version: 0.1.1
+# Turns: 2
+# Author: AI
+# Date: 2025-09-08T05:07:24Z
+# Exports: postgres service, app service
+# Description: Orchestrates local Postgres and application containers.
+####################################################################################################
+
 version: "3.9"
 
 services:
   postgres:
     image: postgres:16
-    container_name: ${COMPOSE_PROJECT_NAME:-my-spring-app}-postgres
+    container_name: ${COMPOSE_PROJECT_NAME:-customer-registration-service}-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-mydb}
-      POSTGRES_USER: ${DB_USERNAME:-myuser}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_DB: ${DB_NAME:-app}
+      POSTGRES_USER: ${DB_USERNAME:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-abc123}
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-myuser} -d ${DB_NAME:-mydb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-admin} -d ${DB_NAME:-app}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -22,16 +34,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ${COMPOSE_PROJECT_NAME:-my-spring-app}-app
+    container_name: ${COMPOSE_PROJECT_NAME:-customer-registration-service}-app
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-mydb}
-      DB_USERNAME: ${DB_USERNAME:-myuser}
-      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      DB_NAME: ${DB_NAME:-app}
+      DB_USERNAME: ${DB_USERNAME:-admin}
+      DB_PASSWORD: ${DB_PASSWORD:-abc123}
       SPRING_PROFILES_ACTIVE: local
     ports:
       - "${APP_PORT:-8080}:8080"
