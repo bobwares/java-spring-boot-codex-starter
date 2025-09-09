@@ -22,7 +22,8 @@
 - description: Spring Boot service for managing customer registrations
 
 ## Domain
-
+- Domain Object
+  Customer
 - REST API Request Schema
   load ./schemas/customer.schema.json
 - REST API Response Schema
