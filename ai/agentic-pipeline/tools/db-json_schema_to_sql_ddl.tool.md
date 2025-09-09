@@ -1,9 +1,9 @@
-# TASK 01 - DB - JSON Schema to SQL Transformation
+# tool - DB - JSON Schema to SQL DDL
 
 
 **Context**:  
 Convert a JSON schema into normalized DDL SQL statements.  
-Directory: `/db`
+Output Directory: `/db`
 
 **Constraints**:
 - Use PostgreSQL v16 dialect
@@ -16,8 +16,7 @@ Directory: `/db`
 
 **Inputs**
 
-- Domain: referenced in Ticket.
-- JSON Schema referenced in Ticket.
+- codex session context: Persisted Data schema
 
 **Output**:  
 

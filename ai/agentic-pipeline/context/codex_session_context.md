@@ -21,3 +21,11 @@
 - name: Customer Registration
 - description: Spring Boot service for managing customer registrations
 
+## Domain
+
+- REST API Request Schema
+  load ./schemas/customer.schema.json
+- REST API Response Schema
+  load ./schemas/customer.schema.json
+- Persisted Data schema
+    load ./schemas/customer.schema.json
