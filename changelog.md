@@ -30,3 +30,21 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-09 19:14:32 UTC (work)
+
+#### Task
+Add customer profile migration
+
+#### Changes
+- Added SQL migration for customer_profile schema.
+- Added db README with migration instructions.
+
+### 0.0.5 – 2025-09-09 19:18:27 UTC (work)
+
+#### Task
+Automate customer profile migration
+
+#### Changes
+- Added script to apply SQL migrations.
+- Added Makefile target and documentation to run migrations.

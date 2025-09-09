@@ -1,0 +1,18 @@
+{
+  "turnId": 2,
+  "timestampUtc": "2025-09-09T19:14:32Z",
+  "task": "db-json_schema_to_sql_ddl",
+  "changes": {
+    "added": [
+      "db/README.md",
+      "db/migrations/01_customer_profile_tables.sql",
+      "ai/agentic-pipeline/turns/2/changelog.md",
+      "ai/agentic-pipeline/turns/2/adr.md",
+      "ai/agentic-pipeline/turns/2/manifest.json"
+    ],
+    "modified": [
+      "changelog.md"
+    ],
+    "deleted": []
+  }
+}

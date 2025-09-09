@@ -1,13 +1,14 @@
 # App: common
 # Package: root
 # File: Makefile
-# Version: 0.2.0
-# Author: AI
-# Date: 2025-09-07T15:30:00Z
-# Exports: build, test, docker-up, docker-down, docker-logs
-# Description: Simplifies Maven build/test operations and Docker Compose lifecycle.
+# Version: 0.3.0
+# Turns: 1,3
+# Author: AI Agent
+# Date: 2025-09-09T19:18:27Z
+# Exports: build, test, docker-up, docker-down, docker-logs, db-migrate
+# Description: Simplifies Maven build/test operations, Docker Compose lifecycle, and database migrations.
 
-.PHONY: build test docker-up docker-down docker-logs
+.PHONY: build test docker-up docker-down docker-logs db-migrate
 
 build:
 	./mvnw clean package
@@ -23,3 +24,6 @@ docker-down:
 
 docker-logs:
 	docker compose logs -f
+
+db-migrate:
+	./db/apply_migrations.sh
