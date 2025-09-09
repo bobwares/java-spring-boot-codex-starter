@@ -1,6 +1,6 @@
-# About
+# Codex Session Context
 
-open and read file project_root/ai/agentic-pipeline/context/About.md
+open and read file project_root/ai/agentic-pipeline/context/codex_session_context.md
 
 # Turns
 
