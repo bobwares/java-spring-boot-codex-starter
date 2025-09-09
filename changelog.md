@@ -30,3 +30,14 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-09 22:44:34 UTC (work)
+
+#### Task
+Create app
+
+#### Changes
+- Set Maven coordinates for Customer Registration.
+- Added SQL migration and seed data.
+- Created JPA entities and repository.
+- Implemented Customer CRUD API with tests and e2e script.

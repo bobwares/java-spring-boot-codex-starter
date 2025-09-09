@@ -1,0 +1,51 @@
+###
+# App: Customer Registration
+# Package: e2e
+# File: customer.http
+# Version: 0.1.0
+# Turns: 2
+# Author: Codex
+# Date: 2025-09-09T22:44:34Z
+# Exports: customer CRUD scenario
+# Description: E2E HTTP requests for customer lifecycle.
+###
+
+@host = http://localhost:8080
+
+### Create
+POST {{host}}/api/customers
+Content-Type: application/json
+
+{
+  "first_name": "Alice",
+  "last_name": "Smith",
+  "emails": ["alice@example.com"],
+  "phone_numbers": [{"type": "mobile", "number": "+15555550101"}],
+  "address": {"line1": "100 Market St", "city": "Springfield", "state": "IL", "postal_code": "62701", "country": "US"},
+  "privacy_settings": {"marketing_emails_enabled": true, "two_factor_enabled": true}
+}
+
+> {% assign id = response.body.id %}
+
+### Get
+GET {{host}}/api/customers/{{id}}
+
+### Update
+PUT {{host}}/api/customers/{{id}}
+Content-Type: application/json
+
+{
+  "first_name": "Bob",
+  "last_name": "Jones",
+  "emails": ["bob@example.com"],
+  "phone_numbers": [{"type": "mobile", "number": "+15555550102"}],
+  "address": {"line1": "200 Oak Ave", "city": "Madison", "state": "WI", "postal_code": "53703", "country": "US"},
+  "privacy_settings": {"marketing_emails_enabled": false, "two_factor_enabled": true}
+}
+
+### Delete
+DELETE {{host}}/api/customers/{{id}}
+
+### Verify 404
+GET {{host}}/api/customers/{{id}}
+

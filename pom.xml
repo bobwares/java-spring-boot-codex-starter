@@ -7,11 +7,11 @@
         <version>3.5.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.bobwares</groupId>
-    <artifactId>common</artifactId>
+    <groupId>com.bobwares.customer</groupId>
+    <artifactId>registration</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>common</name>
-    <description>Codex Java Spring Starter</description>
+    <name>Customer Registration</name>
+    <description>Spring Boot service for managing customer registrations</description>
     <properties>
         <java.version>21</java.version>
         <spring.boot.version>3.5.5</spring.boot.version>
