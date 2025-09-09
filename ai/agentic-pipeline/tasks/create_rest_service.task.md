@@ -4,12 +4,29 @@ Create a complete REST service based on input parameters.
 
 ## Inputs
 
-- API Request Schema (authoritative): `project_root/schemas/{{domain_object}}.schema.json`
-- Package root: {{package_name}}
-- Project name: {{project_name}}
-- Version seed: `0.1.0`
+codex_session_context variables.
+
+# Project
+
+- Name: Customer Registration
+- Detailed Description
+- Author: Bobwares ([bobwares@outlook.com](mailto:bobwares@outlook.com))
+
+## Maven
+
+- groupId
+- artifactId
+- name
+- description
+
+## Domain
+
+- REST API Request Schema 
+- REST API Response Schema
+- Persisted Data schema
+  
+
 
 ## Workflow
 
 - execute tool project_root/ai/agentic-pipeline/tools/crud.tool.md 
-- pass inputs
