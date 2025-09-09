@@ -1,21 +1,18 @@
-# TASK 03 – DB – Create Test Data for Schema
+# tool – DB – Create Test Data for Schema
 
 ### Context
 
-Seed initial customer data for development (PostgreSQL 16, plain SQL, Docker).
+Create SQL statements to insert the initial set of data for the domain in to the SQL database.
 
----
 
-### Requirements
-
-* **File location:** `db/scripts/<domain>_test_data.sql`
-* **Insert 10 customers** into the `customer` table with columns: `customer_id`, `name`, `email`.
-* **Idempotent** – use `INSERT … ON CONFLICT DO NOTHING`.
-* **Metadata header** (App, Package, File, Version, Author, Date, Description).
-* **Realistic sample data** (names + emails).
-* **Timestamps in UTC** (script comment or explicit `timezone` clause).
-* **Smoke-test query** that counts rows.
-* Follow project SQL style conventions.
+- File location:** `db/scripts/<domain>_test_data.sql`
+- Insert 20 sets domain objects** 
+- Idempotent** – use `INSERT … ON CONFLICT DO NOTHING`.
+- Metadata header** (App, Package, File, Version, Author, Date, Description).
+- Realistic sample data** (names + emails).
+- Timestamps in UTC** (script comment or explicit `timezone` clause).
+- Smoke-test query** that counts rows.
+- Follow project SQL style conventions.
 
 ---
 
@@ -23,7 +20,7 @@ Seed initial customer data for development (PostgreSQL 16, plain SQL, Docker).
 
 * Script file exists at `project_root/db/scripts/<domain>_test_data.sql`.
 * Header present and accurate.
-* Exactly 10 `INSERT` rows, each idempotent.
+* Exactly 20 `INSERT` rows, each idempotent.
 * Script runs cleanly multiple times without duplicate rows.
 * Smoke-test query present and returns **≥ 10** rows after first run.
 
