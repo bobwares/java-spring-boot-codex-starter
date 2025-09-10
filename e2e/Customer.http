@@ -1,0 +1,48 @@
+# App: Customer Registration
+# Package: e2e
+# File: Customer.http
+# Version: 0.1.0
+# Turns: 2
+# Author: AI
+# Date: 2025-09-10T16:44:42Z
+# Exports: Customer HTTP scenario
+# Description: Demonstrates end-to-end Customer API flow.
+
+@host = http://localhost:{{PORT:8080}}
+
+### Create Customer
+POST {{host}}/api/customers
+Content-Type: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "emails": ["alice@example.com"],
+  "address": { "line1": "100 Main St", "city": "City", "state": "ST", "country": "US" },
+  "privacySettings": { "marketingEmailsEnabled": true, "twoFactorEnabled": false },
+  "phoneNumbers": [ { "type": "mobile", "number": "+15550000001" } ]
+}
+>
+{% client.global.set("id", response.body.id); %}
+
+### Get Customer
+GET {{host}}/api/customers/{{id}}
+
+### Update Customer
+PUT {{host}}/api/customers/{{id}}
+Content-Type: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "emails": ["alice@example.com"],
+  "address": { "line1": "101 Main St", "city": "City", "state": "ST", "country": "US" },
+  "privacySettings": { "marketingEmailsEnabled": true, "twoFactorEnabled": false },
+  "phoneNumbers": [ { "type": "mobile", "number": "+15550000001" } ]
+}
+
+### Delete Customer
+DELETE {{host}}/api/customers/{{id}}
+
+### Get After Delete
+GET {{host}}/api/customers/{{id}}
