@@ -119,9 +119,7 @@ All source code, config, and prompt files must include a **metadata header**:
     * Store generated code, schemas, or configs in `artifacts/`.
     * Write/update ADR and changelog.
 
-5. **Versioning**
 
-    * Update file headers and `version.md`.
 
 ---
 
