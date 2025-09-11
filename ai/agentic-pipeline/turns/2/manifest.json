@@ -1,0 +1,43 @@
+{
+  "turnId": 2,
+  "timestampUtc": "2025-09-11T08:54:27Z",
+  "task": "initialize_pattern_spring_rest_jpa",
+  "changes": {
+    "added": [
+      "ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md",
+      "ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md",
+      "ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md",
+      "ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md",
+      "ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md",
+      "ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md",
+      "ai/agentic-pipeline/tools/problem-json-error_handling.tool.md",
+      "ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md",
+      "ai/agentic-pipeline/tools/e2e-http_scenario.tool.md",
+      "ai/agentic-pipeline/tools/ci-validate_turn.tool.md",
+      "ai/artifacts/field-mapping.json",
+      "ai/artifacts/schema-report.json",
+      "src/main/resources/db/migration/V1__baseline.sql",
+      "src/main/resources/db/migration/V2__customer_tables.sql",
+      "src/main/java/com/bobwares/customer/registration/Customer.java",
+      "src/main/java/com/bobwares/customer/registration/PrivacySettings.java",
+      "src/main/java/com/bobwares/customer/registration/CustomerRepository.java",
+      "src/main/java/com/bobwares/customer/registration/CustomerService.java",
+      "src/main/java/com/bobwares/customer/registration/TracingConfig.java",
+      "src/main/java/com/bobwares/customer/registration/api/CustomerDto.java",
+      "src/main/java/com/bobwares/customer/registration/api/CustomerController.java",
+      "src/main/java/com/bobwares/customer/registration/web/RestExceptionHandler.java",
+      "src/test/java/com/bobwares/customer/registration/PostgresTestContainer.java",
+      "src/test/java/com/bobwares/customer/registration/CustomerControllerIT.java",
+      "src/test/resources/application-test.yml",
+      "e2e/Customer.http",
+      ".github/workflows/turn-validate.yml"
+    ],
+    "modified": [
+      "pom.xml",
+      "src/main/resources/application.yml",
+      "src/main/resources/application-local.yml",
+      "AGENTS.md",
+      "changelog.md"
+    ]
+  }
+}

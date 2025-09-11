@@ -1,0 +1,16 @@
+####################################################################################################
+# App: registration
+# Package: com.bobwares.customer.registration
+# File: application-test.yml
+# Version: 0.1.0
+# Turns: 2
+# Author: Bobwares
+# Date: 2025-09-11T08:54:27Z
+# Exports: spring.jpa.hibernate.ddl-auto
+# Description: Test profile configuration for integration tests.
+####################################################################################################
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate

@@ -1,0 +1,33 @@
+# App: registration
+# Package: github.workflow
+# File: turn-validate.yml
+# Version: 0.1.0
+# Turns: 2
+# Author: Bobwares
+# Date: 2025-09-11T08:54:27Z
+# Exports: validate-turn workflow
+# Description: CI workflow to validate turn artifacts and run tests.
+name: Validate Turn
+on:
+  push:
+    branches: [ "turn/**" ]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build & Test
+        run: ./mvnw -q -DskipTests=false verify
+      - name: Validate Turn Artifacts
+        run: |
+          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/manifest.json
+          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/adr.md
+          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/changelog.md
+          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/diff.patch

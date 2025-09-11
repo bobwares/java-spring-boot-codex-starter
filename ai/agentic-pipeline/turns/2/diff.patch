@@ -1,0 +1,1753 @@
+diff --git a/.github/workflows/turn-validate.yml b/.github/workflows/turn-validate.yml
+new file mode 100644
+index 0000000..4494094
+--- /dev/null
++++ b/.github/workflows/turn-validate.yml
+@@ -0,0 +1,33 @@
++# App: registration
++# Package: github.workflow
++# File: turn-validate.yml
++# Version: 0.1.0
++# Turns: 2
++# Author: Bobwares
++# Date: 2025-09-11T08:54:27Z
++# Exports: validate-turn workflow
++# Description: CI workflow to validate turn artifacts and run tests.
++name: Validate Turn
++on:
++  push:
++    branches: [ "turn/**" ]
++  pull_request:
++
++jobs:
++  validate:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Set up JDK
++        uses: actions/setup-java@v4
++        with:
++          distribution: temurin
++          java-version: '21'
++      - name: Build & Test
++        run: ./mvnw -q -DskipTests=false verify
++      - name: Validate Turn Artifacts
++        run: |
++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/manifest.json
++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/adr.md
++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/changelog.md
++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/diff.patch
+diff --git a/AGENTS.md b/AGENTS.md
+index 1f63c65..433986c 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -121,3 +121,9 @@ List the trade-offs and implications (positive and negative).
+ ```
+ 
+ 
++
++# Patterns
++
++- Pattern: Spring REST + JPA (Sync)
++  - Task: project_root/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
++  - Required tools (in order): maven-apply_dependencies → spring-boot-apply_configuration → schema-lint_and_normalize → db-json_schema_to_sql_ddl → flyway-baseline_and_migration → persistence-generate_persistence_code → rest-generate_rest_api → problem-json-error_handling → testcontainers-setup_postgres → micrometer-otel-setup → e2e-http_scenario → ci-validate_turn
+diff --git a/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md b/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
+new file mode 100644
+index 0000000..fa873fe
+--- /dev/null
++++ b/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
+@@ -0,0 +1,66 @@
++# Task — Initialize Pattern: Spring REST + JPA (Synchronous)
++
++## Summary
++Provision a Spring Boot REST service backed by JPA/Hibernate on PostgreSQL with Flyway migrations, OpenAPI docs, Testcontainers-based integration tests, operational observability, and an E2E HTTP scenario. Sources of truth: Codex Session Context and domain JSON Schema.
++
++## Inputs (from Codex Session Context)
++- Project
++  - Name
++  - Author
++- Maven
++  - groupId
++  - artifactId
++  - name
++  - description
++- Domain
++  - Domain Object (singular)
++  - Persisted Data schema (JSON)
++- Tech assumptions
++  - Java 21, Spring Boot 3.5.x, Hibernate 6.x, PostgreSQL 16
++
++## Orchestration (tools in order)
++1. maven-apply_dependencies.tool.md
++2. spring-boot-apply_configuration.tool.md
++3. schema-lint_and_normalize.tool.md
++4. db-json_schema_to_sql_ddl.tool.md
++5. flyway-baseline_and_migration.tool.md
++6. persistence-generate_persistence_code.tool.md
++7. rest-generate_rest_api.tool.md
++8. problem-json-error_handling.tool.md
++9. testcontainers-setup_postgres.tool.md
++10. micrometer-otel-setup.tool.md
++11. e2e-http_scenario.tool.md
++12. ci-validate_turn.tool.md
++
++## Expected Outputs (minimum set)
++- pom.xml updated with required dependencies/plugins
++- src/main/resources/application.yml (+ application-local.yml)
++- src/main/resources/db/migration/V1__baseline.sql (and next migrations)
++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}.java
++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}Repository.java
++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}Service.java
++- src/main/java/{{groupIdPath}}/{{artifactId}}/api/{{Domain}}Dto.java
++- src/main/java/{{groupIdPath}}/{{artifactId}}/api/{{Domain}}Controller.java
++- src/main/java/{{groupIdPath}}/{{artifactId}}/web/RestExceptionHandler.java
++- src/test/java/{{groupIdPath}}/{{artifactId}}/PostgresTestContainer.java
++- src/test/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}ControllerIT.java
++- e2e/{{Domain}}.http
++- ai/artifacts/schema-report.json
++- turns/<TurnID>/{manifest.json, adr.md, changelog.md, diff.patch}
++- .github/workflows/turn-validate.yml
++
++## Acceptance Criteria
++- Build: mvn -q -DskipTests=false verify passes
++- DB: Flyway migrates cleanly in integration tests (Testcontainers Postgres)
++- API: OpenAPI UI available at /swagger-ui.html; models render
++- REST: CRUD IT covers happy-path and 404/409; E2E .http runs end-to-end
++- Observability: Actuator health, metrics, and tracing beans present
++- Lint: schema-lint report produced; task returns status: "success" with file list
++
++## Result Format
++Return a JSON object:
++{
++  "status": "success",
++  "files": [ { "path": "...", "content": "..." }, ... ],
++  "metrics": { "filesCreated": N, "testsAdded": M }
++}
+diff --git a/ai/agentic-pipeline/tools/ci-validate_turn.tool.md b/ai/agentic-pipeline/tools/ci-validate_turn.tool.md
+new file mode 100644
+index 0000000..906365e
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/ci-validate_turn.tool.md
+@@ -0,0 +1,7 @@
++# Tool — CI Validate Turn
++
++## Purpose
++Emit a GitHub Actions workflow that validates manifest/changelog/adr presence, runs tests, and uploads turn artifacts.
++
++## Output
++- .github/workflows/turn-validate.yml
+diff --git a/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md b/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md
+new file mode 100644
+index 0000000..fb67582
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md
+@@ -0,0 +1,7 @@
++# Tool — E2E HTTP Scenario
++
++## Purpose
++Generate a .http file that exercises create→get→list→update→delete flow with asserts.
++
++## Output
++- e2e/{{Domain}}.http
+diff --git a/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md b/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md
+new file mode 100644
+index 0000000..727ae86
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md
+@@ -0,0 +1,11 @@
++# Tool — Flyway: Baseline and Migrations
++
++## Purpose
++Convert DDL output into Flyway-compliant migration files, create baseline if none exists.
++
++## Inputs
++- DDL SQL from db-json_schema_to_sql_ddl.tool.md
++
++## Output
++- src/main/resources/db/migration/V1__baseline.sql (schema create)
++- src/main/resources/db/migration/V2__<domain>_tables.sql (normalized tables/indexes)
+diff --git a/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md b/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md
+new file mode 100644
+index 0000000..23dd821
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md
+@@ -0,0 +1,26 @@
++# Tool — Maven: Apply Dependencies and Plugins (Java 21 / Spring Boot 3.5.x)
++
++## Purpose
++Ensure pom.xml includes Spring Boot parent or BOM, Java 21 toolchain, and required deps/plugins for the pattern.
++
++## Inputs
++- groupId, artifactId, name, description
++- dependency set:
++  - spring-boot-starter-web
++  - spring-boot-starter-data-jpa
++  - org.postgresql:postgresql (runtime)
++  - org.springdoc:springdoc-openapi-starter-webmvc-ui
++  - org.flywaydb:flyway-core
++  - org.testcontainers:postgresql (test)
++  - io.micrometer:micrometer-tracing-bridge-otel (runtime)
++  - io.opentelemetry:opentelemetry-exporter-otlp (runtime)
++
++## Behavior
++- If missing, set:
++  - <parent> org.springframework.boot:spring-boot-starter-parent:3.5.x
++  - maven-compiler-plugin release 21
++  - maven-surefire-plugin (junit-platform)
++- Idempotent XML edits (preserve formatting)
++
++## Output
++- Updated pom.xml
+diff --git a/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md b/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md
+new file mode 100644
+index 0000000..fc80c8b
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md
+@@ -0,0 +1,8 @@
++# Tool — Micrometer + OpenTelemetry Setup
++
++## Purpose
++Enable tracing/metrics export and context propagation.
++
++## Output
++- TracingConfig.java (bean setup)
++- application.yml OTLP exporter settings
+diff --git a/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md b/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md
+new file mode 100644
+index 0000000..1efe5f1
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md
+@@ -0,0 +1,8 @@
++# Tool — Problem+JSON Error Handling
++
++## Purpose
++Add global exception handling with RFC 7807 payloads.
++
++## Output
++- src/main/java/.../web/RestExceptionHandler.java
++- src/main/java/.../web/ErrorResponse.java
+diff --git a/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md b/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md
+new file mode 100644
+index 0000000..0e880d3
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md
+@@ -0,0 +1,9 @@
++# Tool — Schema: Lint and Normalize
++
++## Purpose
++Validate JSON Schema (2020-12), produce a field mapping (camelCase → snake_case), and basic type report.
++
++## Output
++- ai/artifacts/schema-report.json
++- ai/artifacts/field-mapping.json
++- status: success/failure with diagnostics
+diff --git a/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md b/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md
+new file mode 100644
+index 0000000..c24b2df
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md
+@@ -0,0 +1,25 @@
++# Tool — Spring Boot: Apply Base Configuration
++
++## Purpose
++Create application.yml and application-local.yml with datasource, JPA, Flyway, Actuator endpoints, and profile wiring.
++
++## Behavior
++Generate:
++- src/main/resources/application.yml
++- src/main/resources/application-local.yml
++
++## application.yml (high level)
++- server.port = ${APP_PORT:8080}
++- spring.jpa.open-in-view=false, hibernate ddl-auto=validate
++- spring.flyway.enabled=true
++- management.endpoints.web.exposure.include=health,info,metrics,prometheus
++- tracing: OTLP endpoint configurable
++
++## application-local.yml
++- spring.datasource.url=jdbc:postgresql://localhost:${DB_PORT:5432}/${DB_NAME:app}
++- spring.datasource.username=${DB_USERNAME:admin}
++- spring.datasource.password=${DB_PASSWORD:abc123}
++- spring.jpa.properties.hibernate.default_schema=${DB_SCHEMA:public}
++
++## Output
++- application.yml files with metadata headers
+diff --git a/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md b/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md
+new file mode 100644
+index 0000000..370d366
+--- /dev/null
++++ b/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md
+@@ -0,0 +1,8 @@
++# Tool — Testcontainers: PostgreSQL Setup
++
++## Purpose
++Provide a reusable singleton Postgres container and a base test configuration.
++
++## Output
++- src/test/java/.../PostgresTestContainer.java
++- src/test/resources/application-test.yml (overrides to container URL)
+diff --git a/ai/agentic-pipeline/turns/2/adr.md b/ai/agentic-pipeline/turns/2/adr.md
+new file mode 100644
+index 0000000..eef4777
+--- /dev/null
++++ b/ai/agentic-pipeline/turns/2/adr.md
+@@ -0,0 +1,15 @@
++# Adopt Spring MVC + JPA + Flyway + Testcontainers as baseline for synchronous CRUD services
++
++**Status**: Accepted
++
++**Date**: 2025-09-11
++
++**Context**
++Need a standard synchronous CRUD stack with database migrations and testing support.
++
++**Decision**
++Adopt Spring MVC with JPA, Flyway, Testcontainers, and Micrometer tracing as the default pattern.
++
++**Consequences**
++- Provides consistent scaffolding for REST services.
++- Increases initial project complexity but streamlines future turns.
+diff --git a/ai/agentic-pipeline/turns/2/changelog.md b/ai/agentic-pipeline/turns/2/changelog.md
+new file mode 100644
+index 0000000..8d9936b
+--- /dev/null
++++ b/ai/agentic-pipeline/turns/2/changelog.md
+@@ -0,0 +1,14 @@
++# Turn: 2 – 2025-09-11T08:54:27Z
++
++## prompt
++
++Initialize Spring REST + JPA pattern
++
++#### Task
++Initialize pattern and add required artifacts
++
++#### Changes
++- Added Spring REST + JPA pattern task and tools.
++- Generated Customer domain, repository, service, controller, and DTO.
++- Added Flyway migrations, configuration, tracing, and CI workflow.
++- Created integration test and E2E HTTP scenario.
+diff --git a/ai/agentic-pipeline/turns/2/diff.patch b/ai/agentic-pipeline/turns/2/diff.patch
+new file mode 100644
+index 0000000..5666dbe
+--- /dev/null
++++ b/ai/agentic-pipeline/turns/2/diff.patch
+@@ -0,0 +1,327 @@
++diff --git a/.github/workflows/turn-validate.yml b/.github/workflows/turn-validate.yml
++new file mode 100644
++index 0000000..4494094
++--- /dev/null
+++++ b/.github/workflows/turn-validate.yml
++@@ -0,0 +1,33 @@
+++# App: registration
+++# Package: github.workflow
+++# File: turn-validate.yml
+++# Version: 0.1.0
+++# Turns: 2
+++# Author: Bobwares
+++# Date: 2025-09-11T08:54:27Z
+++# Exports: validate-turn workflow
+++# Description: CI workflow to validate turn artifacts and run tests.
+++name: Validate Turn
+++on:
+++  push:
+++    branches: [ "turn/**" ]
+++  pull_request:
+++
+++jobs:
+++  validate:
+++    runs-on: ubuntu-latest
+++    steps:
+++      - uses: actions/checkout@v4
+++      - name: Set up JDK
+++        uses: actions/setup-java@v4
+++        with:
+++          distribution: temurin
+++          java-version: '21'
+++      - name: Build & Test
+++        run: ./mvnw -q -DskipTests=false verify
+++      - name: Validate Turn Artifacts
+++        run: |
+++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/manifest.json
+++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/adr.md
+++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/changelog.md
+++          test -f project_root/ai/agentic-pipeline/turns/${{ github.run_id }}/diff.patch
++diff --git a/AGENTS.md b/AGENTS.md
++index 1f63c65..433986c 100644
++--- a/AGENTS.md
+++++ b/AGENTS.md
++@@ -121,3 +121,9 @@ List the trade-offs and implications (positive and negative).
++ ```
++ 
++ 
+++
+++# Patterns
+++
+++- Pattern: Spring REST + JPA (Sync)
+++  - Task: project_root/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
+++  - Required tools (in order): maven-apply_dependencies → spring-boot-apply_configuration → schema-lint_and_normalize → db-json_schema_to_sql_ddl → flyway-baseline_and_migration → persistence-generate_persistence_code → rest-generate_rest_api → problem-json-error_handling → testcontainers-setup_postgres → micrometer-otel-setup → e2e-http_scenario → ci-validate_turn
++diff --git a/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md b/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
++new file mode 100644
++index 0000000..fa873fe
++--- /dev/null
+++++ b/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
++@@ -0,0 +1,66 @@
+++# Task — Initialize Pattern: Spring REST + JPA (Synchronous)
+++
+++## Summary
+++Provision a Spring Boot REST service backed by JPA/Hibernate on PostgreSQL with Flyway migrations, OpenAPI docs, Testcontainers-based integration tests, operational observability, and an E2E HTTP scenario. Sources of truth: Codex Session Context and domain JSON Schema.
+++
+++## Inputs (from Codex Session Context)
+++- Project
+++  - Name
+++  - Author
+++- Maven
+++  - groupId
+++  - artifactId
+++  - name
+++  - description
+++- Domain
+++  - Domain Object (singular)
+++  - Persisted Data schema (JSON)
+++- Tech assumptions
+++  - Java 21, Spring Boot 3.5.x, Hibernate 6.x, PostgreSQL 16
+++
+++## Orchestration (tools in order)
+++1. maven-apply_dependencies.tool.md
+++2. spring-boot-apply_configuration.tool.md
+++3. schema-lint_and_normalize.tool.md
+++4. db-json_schema_to_sql_ddl.tool.md
+++5. flyway-baseline_and_migration.tool.md
+++6. persistence-generate_persistence_code.tool.md
+++7. rest-generate_rest_api.tool.md
+++8. problem-json-error_handling.tool.md
+++9. testcontainers-setup_postgres.tool.md
+++10. micrometer-otel-setup.tool.md
+++11. e2e-http_scenario.tool.md
+++12. ci-validate_turn.tool.md
+++
+++## Expected Outputs (minimum set)
+++- pom.xml updated with required dependencies/plugins
+++- src/main/resources/application.yml (+ application-local.yml)
+++- src/main/resources/db/migration/V1__baseline.sql (and next migrations)
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}.java
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}Repository.java
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}Service.java
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/api/{{Domain}}Dto.java
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/api/{{Domain}}Controller.java
+++- src/main/java/{{groupIdPath}}/{{artifactId}}/web/RestExceptionHandler.java
+++- src/test/java/{{groupIdPath}}/{{artifactId}}/PostgresTestContainer.java
+++- src/test/java/{{groupIdPath}}/{{artifactId}}/{{Domain}}ControllerIT.java
+++- e2e/{{Domain}}.http
+++- ai/artifacts/schema-report.json
+++- turns/<TurnID>/{manifest.json, adr.md, changelog.md, diff.patch}
+++- .github/workflows/turn-validate.yml
+++
+++## Acceptance Criteria
+++- Build: mvn -q -DskipTests=false verify passes
+++- DB: Flyway migrates cleanly in integration tests (Testcontainers Postgres)
+++- API: OpenAPI UI available at /swagger-ui.html; models render
+++- REST: CRUD IT covers happy-path and 404/409; E2E .http runs end-to-end
+++- Observability: Actuator health, metrics, and tracing beans present
+++- Lint: schema-lint report produced; task returns status: "success" with file list
+++
+++## Result Format
+++Return a JSON object:
+++{
+++  "status": "success",
+++  "files": [ { "path": "...", "content": "..." }, ... ],
+++  "metrics": { "filesCreated": N, "testsAdded": M }
+++}
++diff --git a/ai/agentic-pipeline/tools/ci-validate_turn.tool.md b/ai/agentic-pipeline/tools/ci-validate_turn.tool.md
++new file mode 100644
++index 0000000..906365e
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/ci-validate_turn.tool.md
++@@ -0,0 +1,7 @@
+++# Tool — CI Validate Turn
+++
+++## Purpose
+++Emit a GitHub Actions workflow that validates manifest/changelog/adr presence, runs tests, and uploads turn artifacts.
+++
+++## Output
+++- .github/workflows/turn-validate.yml
++diff --git a/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md b/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md
++new file mode 100644
++index 0000000..fb67582
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/e2e-http_scenario.tool.md
++@@ -0,0 +1,7 @@
+++# Tool — E2E HTTP Scenario
+++
+++## Purpose
+++Generate a .http file that exercises create→get→list→update→delete flow with asserts.
+++
+++## Output
+++- e2e/{{Domain}}.http
++diff --git a/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md b/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md
++new file mode 100644
++index 0000000..727ae86
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md
++@@ -0,0 +1,11 @@
+++# Tool — Flyway: Baseline and Migrations
+++
+++## Purpose
+++Convert DDL output into Flyway-compliant migration files, create baseline if none exists.
+++
+++## Inputs
+++- DDL SQL from db-json_schema_to_sql_ddl.tool.md
+++
+++## Output
+++- src/main/resources/db/migration/V1__baseline.sql (schema create)
+++- src/main/resources/db/migration/V2__<domain>_tables.sql (normalized tables/indexes)
++diff --git a/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md b/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md
++new file mode 100644
++index 0000000..23dd821
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md
++@@ -0,0 +1,26 @@
+++# Tool — Maven: Apply Dependencies and Plugins (Java 21 / Spring Boot 3.5.x)
+++
+++## Purpose
+++Ensure pom.xml includes Spring Boot parent or BOM, Java 21 toolchain, and required deps/plugins for the pattern.
+++
+++## Inputs
+++- groupId, artifactId, name, description
+++- dependency set:
+++  - spring-boot-starter-web
+++  - spring-boot-starter-data-jpa
+++  - org.postgresql:postgresql (runtime)
+++  - org.springdoc:springdoc-openapi-starter-webmvc-ui
+++  - org.flywaydb:flyway-core
+++  - org.testcontainers:postgresql (test)
+++  - io.micrometer:micrometer-tracing-bridge-otel (runtime)
+++  - io.opentelemetry:opentelemetry-exporter-otlp (runtime)
+++
+++## Behavior
+++- If missing, set:
+++  - <parent> org.springframework.boot:spring-boot-starter-parent:3.5.x
+++  - maven-compiler-plugin release 21
+++  - maven-surefire-plugin (junit-platform)
+++- Idempotent XML edits (preserve formatting)
+++
+++## Output
+++- Updated pom.xml
++diff --git a/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md b/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md
++new file mode 100644
++index 0000000..fc80c8b
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md
++@@ -0,0 +1,8 @@
+++# Tool — Micrometer + OpenTelemetry Setup
+++
+++## Purpose
+++Enable tracing/metrics export and context propagation.
+++
+++## Output
+++- TracingConfig.java (bean setup)
+++- application.yml OTLP exporter settings
++diff --git a/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md b/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md
++new file mode 100644
++index 0000000..1efe5f1
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/problem-json-error_handling.tool.md
++@@ -0,0 +1,8 @@
+++# Tool — Problem+JSON Error Handling
+++
+++## Purpose
+++Add global exception handling with RFC 7807 payloads.
+++
+++## Output
+++- src/main/java/.../web/RestExceptionHandler.java
+++- src/main/java/.../web/ErrorResponse.java
++diff --git a/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md b/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md
++new file mode 100644
++index 0000000..0e880d3
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md
++@@ -0,0 +1,9 @@
+++# Tool — Schema: Lint and Normalize
+++
+++## Purpose
+++Validate JSON Schema (2020-12), produce a field mapping (camelCase → snake_case), and basic type report.
+++
+++## Output
+++- ai/artifacts/schema-report.json
+++- ai/artifacts/field-mapping.json
+++- status: success/failure with diagnostics
++diff --git a/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md b/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md
++new file mode 100644
++index 0000000..c24b2df
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md
++@@ -0,0 +1,25 @@
+++# Tool — Spring Boot: Apply Base Configuration
+++
+++## Purpose
+++Create application.yml and application-local.yml with datasource, JPA, Flyway, Actuator endpoints, and profile wiring.
+++
+++## Behavior
+++Generate:
+++- src/main/resources/application.yml
+++- src/main/resources/application-local.yml
+++
+++## application.yml (high level)
+++- server.port = ${APP_PORT:8080}
+++- spring.jpa.open-in-view=false, hibernate ddl-auto=validate
+++- spring.flyway.enabled=true
+++- management.endpoints.web.exposure.include=health,info,metrics,prometheus
+++- tracing: OTLP endpoint configurable
+++
+++## application-local.yml
+++- spring.datasource.url=jdbc:postgresql://localhost:${DB_PORT:5432}/${DB_NAME:app}
+++- spring.datasource.username=${DB_USERNAME:admin}
+++- spring.datasource.password=${DB_PASSWORD:abc123}
+++- spring.jpa.properties.hibernate.default_schema=${DB_SCHEMA:public}
+++
+++## Output
+++- application.yml files with metadata headers
++diff --git a/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md b/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md
++new file mode 100644
++index 0000000..370d366
++--- /dev/null
+++++ b/ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md
++@@ -0,0 +1,8 @@
+++# Tool — Testcontainers: PostgreSQL Setup
+++
+++## Purpose
+++Provide a reusable singleton Postgres container and a base test configuration.
+++
+++## Output
+++- src/test/java/.../PostgresTestContainer.java
+++- src/test/resources/application-test.yml (overrides to container URL)
++diff --git a/ai/agentic-pipeline/turns/2/adr.md b/ai/agentic-pipeline/turns/2/adr.md
++new file mode 100644
++index 0000000..eef4777
++--- /dev/null
+++++ b/ai/agentic-pipeline/turns/2/adr.md
++@@ -0,0 +1,15 @@
+++# Adopt Spring MVC + JPA + Flyway + Testcontainers as baseline for synchronous CRUD services
+++
+++**Status**: Accepted
+++
+++**Date**: 2025-09-11
+++
+++**Context**
+++Need a standard synchronous CRUD stack with database migrations and testing support.
+++
+++**Decision**
+++Adopt Spring MVC with JPA, Flyway, Testcontainers, and Micrometer tracing as the default pattern.
+++
+++**Consequences**
+++- Provides consistent scaffolding for REST services.
+++- Increases initial project complexity but streamlines future turns.
++diff --git a/ai/agentic-pipeline/turns/2/changelog.md b/ai/agentic-pipeline/turns/2/changelog.md
++new file mode 100644
++index 0000000..8d9936b
++--- /dev/null
+++++ b/ai/agentic-pipeline/turns/2/changelog.md
++@@ -0,0 +1,14 @@
+++# Turn: 2 – 2025-09-11T08:54:27Z
+++
+++## prompt
+++
+++Initialize Spring REST + JPA pattern
+++
+++#### Task
+++Initialize pattern and add required artifacts
+++
+++#### Changes
+++- Added Spring REST + JPA pattern task and tools.
+++- Generated Customer domain, repository, service, controller, and
+\ No newline at end of file
+diff --git a/ai/agentic-pipeline/turns/2/manifest.json b/ai/agentic-pipeline/turns/2/manifest.json
+new file mode 100644
+index 0000000..bcbff2b
+--- /dev/null
++++ b/ai/agentic-pipeline/turns/2/manifest.json
+@@ -0,0 +1,43 @@
++{
++  "turnId": 2,
++  "timestampUtc": "2025-09-11T08:54:27Z",
++  "task": "initialize_pattern_spring_rest_jpa",
++  "changes": {
++    "added": [
++      "ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md",
++      "ai/agentic-pipeline/tools/maven-apply_dependencies.tool.md",
++      "ai/agentic-pipeline/tools/spring-boot-apply_configuration.tool.md",
++      "ai/agentic-pipeline/tools/schema-lint_and_normalize.tool.md",
++      "ai/agentic-pipeline/tools/flyway-baseline_and_migration.tool.md",
++      "ai/agentic-pipeline/tools/testcontainers-setup_postgres.tool.md",
++      "ai/agentic-pipeline/tools/problem-json-error_handling.tool.md",
++      "ai/agentic-pipeline/tools/micrometer-otel-setup.tool.md",
++      "ai/agentic-pipeline/tools/e2e-http_scenario.tool.md",
++      "ai/agentic-pipeline/tools/ci-validate_turn.tool.md",
++      "ai/artifacts/field-mapping.json",
++      "ai/artifacts/schema-report.json",
++      "src/main/resources/db/migration/V1__baseline.sql",
++      "src/main/resources/db/migration/V2__customer_tables.sql",
++      "src/main/java/com/bobwares/customer/registration/Customer.java",
++      "src/main/java/com/bobwares/customer/registration/PrivacySettings.java",
++      "src/main/java/com/bobwares/customer/registration/CustomerRepository.java",
++      "src/main/java/com/bobwares/customer/registration/CustomerService.java",
++      "src/main/java/com/bobwares/customer/registration/TracingConfig.java",
++      "src/main/java/com/bobwares/customer/registration/api/CustomerDto.java",
++      "src/main/java/com/bobwares/customer/registration/api/CustomerController.java",
++      "src/main/java/com/bobwares/customer/registration/web/RestExceptionHandler.java",
++      "src/test/java/com/bobwares/customer/registration/PostgresTestContainer.java",
++      "src/test/java/com/bobwares/customer/registration/CustomerControllerIT.java",
++      "src/test/resources/application-test.yml",
++      "e2e/Customer.http",
++      ".github/workflows/turn-validate.yml"
++    ],
++    "modified": [
++      "pom.xml",
++      "src/main/resources/application.yml",
++      "src/main/resources/application-local.yml",
++      "AGENTS.md",
++      "changelog.md"
++    ]
++  }
++}
+diff --git a/ai/artifacts/field-mapping.json b/ai/artifacts/field-mapping.json
+new file mode 100644
+index 0000000..3fa4093
+--- /dev/null
++++ b/ai/artifacts/field-mapping.json
+@@ -0,0 +1,10 @@
++{
++  "id": "id",
++  "firstName": "first_name",
++  "middleName": "middle_name",
++  "lastName": "last_name",
++  "emails": "emails",
++  "phoneNumbers": "phone_numbers",
++  "address": "address",
++  "privacySettings": "privacy_settings"
++}
+diff --git a/ai/artifacts/schema-report.json b/ai/artifacts/schema-report.json
+new file mode 100644
+index 0000000..e1a4e22
+--- /dev/null
++++ b/ai/artifacts/schema-report.json
+@@ -0,0 +1,14 @@
++{
++  "status": "success",
++  "title": "CustomerProfile",
++  "fields": {
++    "id": "string(uuid)",
++    "firstName": "string",
++    "middleName": "string",
++    "lastName": "string",
++    "emails": "array[string]",
++    "phoneNumbers": "array[PhoneNumber]",
++    "address": "PostalAddress",
++    "privacySettings": "PrivacySettings"
++  }
++}
+diff --git a/changelog.md b/changelog.md
+index 47cba24..ccaed01 100644
+--- a/changelog.md
++++ b/changelog.md
+@@ -30,3 +30,14 @@ Add Person CRUD service
+ - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
+ - Add unit and integration tests for Person service and controller.
+ - Provide end-to-end HTTP scenario for Person lifecycle.
++
++### 0.0.4 – 2025-09-11T08:54:27Z (work)
++
++#### Task
++Initialize Spring REST + JPA pattern
++
++#### Changes
++- Add task and tool specifications for Spring REST + JPA pattern.
++- Implement Customer domain with JPA, REST controller, and service.
++- Configure Spring Boot, Flyway migrations, Testcontainers, and tracing.
++- Add CI workflow and E2E HTTP scenario.
+diff --git a/e2e/Customer.http b/e2e/Customer.http
+new file mode 100644
+index 0000000..3827b4f
+--- /dev/null
++++ b/e2e/Customer.http
+@@ -0,0 +1,46 @@
++####################################################################################################
++# App: registration
++# Package: com.bobwares.customer.registration
++# File: Customer.http
++# Version: 0.1.0
++# Turns: 2
++# Author: Bobwares
++# Date: 2025-09-11T08:54:27Z
++# Exports: create, get, update, delete, verify 404
++# Description: End-to-end CRUD flow.
++####################################################################################################
++
++@host = http://localhost:{{PORT:8080}}
++
++### Create
++POST {{host}}/api/customers
++Content-Type: application/json
++
++{
++  "firstName": "Alice",
++  "lastName": "Smith",
++  "emails": ["alice@example.com"],
++  "privacySettings": {"marketingEmailsEnabled": true, "twoFactorEnabled": false}
++}
++
++> {% client.global.set("id", response.body.id); %}
++
++### Get
++GET {{host}}/api/customers/{{id}}
++
++### Update
++PUT {{host}}/api/customers/{{id}}
++Content-Type: application/json
++
++{
++  "firstName": "Alice",
++  "lastName": "Johnson",
++  "emails": ["alice@example.com"],
++  "privacySettings": {"marketingEmailsEnabled": true, "twoFactorEnabled": true}
++}
++
++### Delete
++DELETE {{host}}/api/customers/{{id}}
++
++### Verify 404
++GET {{host}}/api/customers/{{id}}
+diff --git a/pom.xml b/pom.xml
+index 4d7994c..a0fa37c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -1,121 +1,94 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
++  <modelVersion>4.0.0</modelVersion>
++  <parent>
++    <groupId>org.springframework.boot</groupId>
++    <artifactId>spring-boot-starter-parent</artifactId>
++    <version>3.5.5</version>
++    <relativePath/>
++  </parent>
++  <groupId>com.bobwares</groupId>
++  <artifactId>common</artifactId>
++  <version>0.0.1-SNAPSHOT</version>
++  <name>common</name>
++  <description>Codex Java Spring Starter</description>
++  <properties>
++    <java.version>21</java.version>
++  </properties>
++  <dependencies>
++    <dependency>
++      <groupId>org.springframework.boot</groupId>
++      <artifactId>spring-boot-starter-web</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>org.springframework.boot</groupId>
++      <artifactId>spring-boot-starter-actuator</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>org.springframework.boot</groupId>
++      <artifactId>spring-boot-starter-data-jpa</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>org.postgresql</groupId>
++      <artifactId>postgresql</artifactId>
++      <scope>runtime</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.springdoc</groupId>
++      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>org.flywaydb</groupId>
++      <artifactId>flyway-core</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>io.micrometer</groupId>
++      <artifactId>micrometer-tracing-bridge-otel</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>io.opentelemetry</groupId>
++      <artifactId>opentelemetry-exporter-otlp</artifactId>
++    </dependency>
++    <dependency>
++      <groupId>org.projectlombok</groupId>
++      <artifactId>lombok</artifactId>
++      <optional>true</optional>
++    </dependency>
++    <dependency>
++      <groupId>org.testcontainers</groupId>
++      <artifactId>postgresql</artifactId>
++      <scope>test</scope>
++    </dependency>
++    <dependency>
++      <groupId>org.springframework.boot</groupId>
++      <artifactId>spring-boot-starter-test</artifactId>
++      <scope>test</scope>
++    </dependency>
++  </dependencies>
++  <build>
++    <plugins>
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-compiler-plugin</artifactId>
++        <configuration>
++          <release>21</release>
++          <annotationProcessorPaths>
++            <path>
++              <groupId>org.projectlombok</groupId>
++              <artifactId>lombok</artifactId>
++            </path>
++          </annotationProcessorPaths>
++        </configuration>
++      </plugin>
++      <plugin>
+         <groupId>org.springframework.boot</groupId>
+-        <artifactId>spring-boot-starter-parent</artifactId>
+-        <version>3.5.5</version>
+-        <relativePath/>
+-    </parent>
+-    <groupId>com.bobwares</groupId>
+-    <artifactId>common</artifactId>
+-    <version>0.0.1-SNAPSHOT</version>
+-    <name>common</name>
+-    <description>Codex Java Spring Starter</description>
+-    <properties>
+-        <java.version>21</java.version>
+-        <spring.boot.version>3.5.5</spring.boot.version>
+-    </properties>
+-    <dependencyManagement>
+-        <dependencies>
+-            <dependency>
+-                <groupId>org.springframework.boot</groupId>
+-                <artifactId>spring-boot-dependencies</artifactId>
+-                <version>${spring.boot.version}</version>
+-                <type>pom</type>
+-                <scope>import</scope>
+-            </dependency>
+-        </dependencies>
+-    </dependencyManagement>
+-    <dependencies>
+-        <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-actuator</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-webflux</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-validation</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.springdoc</groupId>
+-            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+-            <version>2.5.0</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.projectlombok</groupId>
+-            <artifactId>lombok</artifactId>
+-            <optional>true</optional>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.postgresql</groupId>
+-            <artifactId>postgresql</artifactId>
+-            <scope>runtime</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.testcontainers</groupId>
+-            <artifactId>postgresql</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.springframework.boot</groupId>
+-            <artifactId>spring-boot-starter-test</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.junit.jupiter</groupId>
+-            <artifactId>junit-jupiter</artifactId>
+-            <version>5.10.2</version>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.projectreactor</groupId>
+-            <artifactId>reactor-test</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-    </dependencies>
+-
+-    <build>
+-        <plugins>
+-            <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+-                <artifactId>maven-compiler-plugin</artifactId>
+-                <configuration>
+-                    <annotationProcessorPaths>
+-                        <path>
+-                            <groupId>org.projectlombok</groupId>
+-                            <artifactId>lombok</artifactId>
+-                        </path>
+-                    </annotationProcessorPaths>
+-                </configuration>
+-            </plugin>
+-            <plugin>
+-                <groupId>org.springframework.boot</groupId>
+-                <artifactId>spring-boot-maven-plugin</artifactId>
+-                <version>${spring.boot.version}</version>
+-
+-                <configuration>
+-                    <excludes>
+-                        <exclude>
+-                            <groupId>org.projectlombok</groupId>
+-                            <artifactId>lombok</artifactId>
+-                        </exclude>
+-                    </excludes>
+-                </configuration>
+-            </plugin>
+-            <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+-                <artifactId>maven-surefire-plugin</artifactId>
+-                <version>3.2.5</version>
+-            </plugin>
+-        </plugins>
+-    </build>
+-
++        <artifactId>spring-boot-maven-plugin</artifactId>
++      </plugin>
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-surefire-plugin</artifactId>
++        <version>3.2.5</version>
++      </plugin>
++    </plugins>
++  </build>
+ </project>
+diff --git a/src/main/java/com/bobwares/customer/registration/Customer.java b/src/main/java/com/bobwares/customer/registration/Customer.java
+new file mode 100644
+index 0000000..4231dcf
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/Customer.java
+@@ -0,0 +1,61 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: Customer.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: Customer
++ * Description: JPA entity representing a customer profile with emails and privacy settings.
++ */
++package com.bobwares.customer.registration;
++
++import java.util.HashSet;
++import java.util.Set;
++import java.util.UUID;
++
++import jakarta.persistence.CollectionTable;
++import jakarta.persistence.Column;
++import jakarta.persistence.ElementCollection;
++import jakarta.persistence.Entity;
++import jakarta.persistence.FetchType;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
++import jakarta.persistence.JoinColumn;
++import jakarta.persistence.OneToOne;
++import jakarta.persistence.Table;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++@Entity
++@Table(name = "customer")
++public class Customer {
++  @Id
++  @Column(name = "customer_id")
++  private UUID id;
++
++  @Column(name = "first_name", nullable = false)
++  private String firstName;
++
++  @Column(name = "middle_name")
++  private String middleName;
++
++  @Column(name = "last_name", nullable = false)
++  private String lastName;
++
++  @ElementCollection(fetch = FetchType.LAZY)
++  @CollectionTable(name = "customer_email", joinColumns = @JoinColumn(name = "customer_id"))
++  @Column(name = "email", nullable = false)
++  private Set<String> emails = new HashSet<>();
++
++  @OneToOne(cascade = jakarta.persistence.CascadeType.ALL)
++  @JoinColumn(name = "privacy_settings_id")
++  private PrivacySettings privacySettings;
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/CustomerRepository.java b/src/main/java/com/bobwares/customer/registration/CustomerRepository.java
+new file mode 100644
+index 0000000..25d5918
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/CustomerRepository.java
+@@ -0,0 +1,19 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: CustomerRepository.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: CustomerRepository
++ * Description: Spring Data repository for Customer entities.
++ */
++package com.bobwares.customer.registration;
++
++import java.util.UUID;
++
++import org.springframework.data.jpa.repository.JpaRepository;
++
++public interface CustomerRepository extends JpaRepository<Customer, UUID> {
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/CustomerService.java b/src/main/java/com/bobwares/customer/registration/CustomerService.java
+new file mode 100644
+index 0000000..91164ba
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/CustomerService.java
+@@ -0,0 +1,57 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: CustomerService.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: CustomerService
++ * Description: Service layer for Customer CRUD operations.
++ */
++package com.bobwares.customer.registration;
++
++import java.util.List;
++import java.util.UUID;
++
++import jakarta.persistence.EntityNotFoundException;
++
++import org.springframework.stereotype.Service;
++
++import lombok.RequiredArgsConstructor;
++
++@Service
++@RequiredArgsConstructor
++public class CustomerService {
++  private final CustomerRepository repository;
++
++  public Customer create(Customer customer) {
++    if (repository.existsById(customer.getId())) {
++      throw new IllegalArgumentException("Customer already exists");
++    }
++    return repository.save(customer);
++  }
++
++  public Customer get(UUID id) {
++    return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
++  }
++
++  public List<Customer> list() {
++    return repository.findAll();
++  }
++
++  public Customer update(UUID id, Customer customer) {
++    if (!repository.existsById(id)) {
++      throw new EntityNotFoundException("Customer not found");
++    }
++    customer.setId(id);
++    return repository.save(customer);
++  }
++
++  public void delete(UUID id) {
++    if (!repository.existsById(id)) {
++      throw new EntityNotFoundException("Customer not found");
++    }
++    repository.deleteById(id);
++  }
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/PrivacySettings.java b/src/main/java/com/bobwares/customer/registration/PrivacySettings.java
+new file mode 100644
+index 0000000..4b22e70
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/PrivacySettings.java
+@@ -0,0 +1,41 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: PrivacySettings.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: PrivacySettings
++ * Description: JPA entity representing customer privacy preferences.
++ */
++package com.bobwares.customer.registration;
++
++import jakarta.persistence.Column;
++import jakarta.persistence.Entity;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
++import jakarta.persistence.Table;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
++@Entity
++@Table(name = "privacy_settings")
++public class PrivacySettings {
++  @Id
++  @GeneratedValue(strategy = GenerationType.IDENTITY)
++  @Column(name = "privacy_settings_id")
++  private Long id;
++
++  @Column(name = "marketing_emails_enabled", nullable = false)
++  private boolean marketingEmailsEnabled;
++
++  @Column(name = "two_factor_enabled", nullable = false)
++  private boolean twoFactorEnabled;
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/TracingConfig.java b/src/main/java/com/bobwares/customer/registration/TracingConfig.java
+new file mode 100644
+index 0000000..f8cbbb5
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/TracingConfig.java
+@@ -0,0 +1,38 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: TracingConfig.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: otlpExporter, openTelemetrySdk
++ * Description: Configures Micrometer tracing with OpenTelemetry exporter.
++ */
++package com.bobwares.customer.registration;
++
++import io.micrometer.tracing.exporter.otlp.OtlpGrpcSpanExporter;
++import io.opentelemetry.sdk.OpenTelemetrySdk;
++import io.opentelemetry.sdk.trace.SdkTracerProvider;
++import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++
++@Configuration
++public class TracingConfig {
++
++  @Bean
++  OtlpGrpcSpanExporter otlpExporter() {
++    return OtlpGrpcSpanExporter.builder()
++        .setEndpoint(System.getenv().getOrDefault("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"))
++        .build();
++  }
++
++  @Bean
++  OpenTelemetrySdk openTelemetrySdk(OtlpGrpcSpanExporter exporter) {
++    var provider = SdkTracerProvider.builder()
++        .addSpanProcessor(BatchSpanProcessor.builder(exporter).build())
++        .build();
++    return OpenTelemetrySdk.builder().setTracerProvider(provider).build();
++  }
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/api/CustomerController.java b/src/main/java/com/bobwares/customer/registration/api/CustomerController.java
+new file mode 100644
+index 0000000..dbcaffb
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/api/CustomerController.java
+@@ -0,0 +1,91 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration.api
++ * File: CustomerController.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: CustomerController
++ * Description: REST controller providing CRUD operations for Customer.
++ */
++package com.bobwares.customer.registration.api;
++
++import java.util.List;
++import java.util.UUID;
++
++import jakarta.validation.Valid;
++
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.DeleteMapping;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PathVariable;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.PutMapping;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.ResponseStatus;
++import org.springframework.web.bind.annotation.RestController;
++
++import com.bobwares.customer.registration.Customer;
++import com.bobwares.customer.registration.CustomerService;
++import com.bobwares.customer.registration.PrivacySettings;
++
++import lombok.RequiredArgsConstructor;
++
++@RestController
++@RequestMapping("/api/customers")
++@RequiredArgsConstructor
++public class CustomerController {
++  private final CustomerService service;
++
++  @PostMapping
++  public ResponseEntity<CustomerDto> create(@Valid @RequestBody CustomerDto dto) {
++    Customer saved = service.create(toEntity(dto));
++    return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
++  }
++
++  @GetMapping("/{id}")
++  public CustomerDto get(@PathVariable UUID id) {
++    return toDto(service.get(id));
++  }
++
++  @GetMapping
++  public List<CustomerDto> list() {
++    return service.list().stream().map(this::toDto).toList();
++  }
++
++  @PutMapping("/{id}")
++  public CustomerDto update(@PathVariable UUID id, @Valid @RequestBody CustomerDto dto) {
++    return toDto(service.update(id, toEntity(dto)));
++  }
++
++  @DeleteMapping("/{id}")
++  @ResponseStatus(HttpStatus.NO_CONTENT)
++  public void delete(@PathVariable UUID id) {
++    service.delete(id);
++  }
++
++  private CustomerDto toDto(Customer customer) {
++    var ps = customer.getPrivacySettings();
++    return new CustomerDto(
++        customer.getId(),
++        customer.getFirstName(),
++        customer.getMiddleName(),
++        customer.getLastName(),
++        customer.getEmails().stream().toList(),
++        new CustomerDto.PrivacySettingsDto(ps.isMarketingEmailsEnabled(), ps.isTwoFactorEnabled()));
++  }
++
++  private Customer toEntity(CustomerDto dto) {
++    PrivacySettings ps = new PrivacySettings(null, dto.privacySettings().marketingEmailsEnabled(), dto.privacySettings().twoFactorEnabled());
++    return new Customer(
++        dto.id() == null ? UUID.randomUUID() : dto.id(),
++        dto.firstName(),
++        dto.middleName(),
++        dto.lastName(),
++        new java.util.HashSet<>(dto.emails()),
++        ps);
++  }
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/api/CustomerDto.java b/src/main/java/com/bobwares/customer/registration/api/CustomerDto.java
+new file mode 100644
+index 0000000..e4131fd
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/api/CustomerDto.java
+@@ -0,0 +1,26 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration.api
++ * File: CustomerDto.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: CustomerDto, PrivacySettingsDto
++ * Description: DTOs for Customer REST API.
++ */
++package com.bobwares.customer.registration.api;
++
++import java.util.List;
++import java.util.UUID;
++
++public record CustomerDto(
++    UUID id,
++    String firstName,
++    String middleName,
++    String lastName,
++    List<String> emails,
++    PrivacySettingsDto privacySettings) {
++
++  public record PrivacySettingsDto(boolean marketingEmailsEnabled, boolean twoFactorEnabled) {}
++}
+diff --git a/src/main/java/com/bobwares/customer/registration/web/RestExceptionHandler.java b/src/main/java/com/bobwares/customer/registration/web/RestExceptionHandler.java
+new file mode 100644
+index 0000000..82ffd7b
+--- /dev/null
++++ b/src/main/java/com/bobwares/customer/registration/web/RestExceptionHandler.java
+@@ -0,0 +1,48 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration.web
++ * File: RestExceptionHandler.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: RestExceptionHandler
++ * Description: Global exception mapping to RFC 7807 Problem+JSON payloads.
++ */
++package com.bobwares.customer.registration.web;
++
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ProblemDetail;
++import org.springframework.web.bind.MethodArgumentNotValidException;
++import org.springframework.web.bind.annotation.ExceptionHandler;
++import org.springframework.web.bind.annotation.RestControllerAdvice;
++
++import jakarta.persistence.EntityNotFoundException;
++
++@RestControllerAdvice
++public class RestExceptionHandler {
++
++  @ExceptionHandler(EntityNotFoundException.class)
++  ProblemDetail handleNotFound(EntityNotFoundException ex) {
++    ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
++    pd.setTitle("Entity not found");
++    pd.setDetail(ex.getMessage());
++    return pd;
++  }
++
++  @ExceptionHandler(MethodArgumentNotValidException.class)
++  ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
++    ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
++    pd.setTitle("Validation failed");
++    pd.setDetail("One or more fields are invalid.");
++    return pd;
++  }
++
++  @ExceptionHandler(IllegalArgumentException.class)
++  ProblemDetail handleBadRequest(IllegalArgumentException ex) {
++    ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
++    pd.setTitle("Bad request");
++    pd.setDetail(ex.getMessage());
++    return pd;
++  }
++}
+diff --git a/src/main/resources/application-local.yml b/src/main/resources/application-local.yml
+index 2a3c1ea..f8e8c4b 100644
+--- a/src/main/resources/application-local.yml
++++ b/src/main/resources/application-local.yml
+@@ -1,16 +1,27 @@
+ ####################################################################################################
+-# App: Customer Registration Service
+-# Package: configuration
++# App: registration
++# Package: com.bobwares.customer
+ # File: application-local.yml
+-# Version: 0.1.0
++# Version: 0.1.1
+ # Turns: 2
+-# Author: AI
+-# Date: 2025-09-08T05:07:24Z
+-# Exports: spring.datasource.username, spring.datasource.password
+-# Description: Local profile overrides using environment variables for DB credentials.
++# Author: Bobwares
++# Date: 2025-09-11T08:54:27Z
++# Exports: spring.datasource.url, spring.datasource.username, spring.datasource.password, spring.jpa.properties.hibernate.default_schema
++# Description: Local profile configuration for Postgres via docker-compose.
+ ####################################################################################################
+ 
+ spring:
+   datasource:
+-    username: ${DB_USERNAME}
+-    password: ${DB_PASSWORD}
+\ No newline at end of file
++    url: jdbc:postgresql://localhost:/
++    username: 
++    password: 
++  jpa:
++    hibernate:
++      ddl-auto: validate
++    properties:
++      hibernate:
++        default_schema: 
++
++logging:
++  level:
++    root: INFO
+diff --git a/src/main/resources/application.yml b/src/main/resources/application.yml
+index 4df265a..8444db8 100644
+--- a/src/main/resources/application.yml
++++ b/src/main/resources/application.yml
+@@ -1,32 +1,40 @@
+ ####################################################################################################
+-# App: Customer Registration Service
+-# Package: configuration
++# App: registration
++# Package: com.bobwares.customer
+ # File: application.yml
+-# Version: 0.1.1
++# Version: 0.1.2
+ # Turns: 2
+-# Author: AI
+-# Date: 2025-09-08T05:07:24Z
+-# Exports: spring.application.name, spring.datasource.url, spring.jpa.hibernate.ddl-auto, logging.level.root
+-# Description: Base application configuration with Postgres datasource and logging settings.
++# Author: Bobwares
++# Date: 2025-09-11T08:54:27Z
++# Exports: server.port, spring.jpa.open-in-view, spring.flyway.enabled, management.endpoints.web.exposure.include, tracing.otlp.endpoint
++# Description: Base application configuration for all profiles.
+ ####################################################################################################
+ 
++server:
++  port: ${APP_PORT:8080} 
++
+ spring:
+   application:
+-    name: ${COMPOSE_PROJECT_NAME:${project_name:customer-registration-service}}
+-
+-  datasource:
+-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:app}
+-    driver-class-name: org.postgresql.Driver
+-
++    name: registration
+   jpa:
+-    hibernate:
+-      ddl-auto: update
++    open-in-view: false
+     properties:
+       hibernate:
+-        dialect: org.hibernate.dialect.PostgreSQLDialect
+-        format_sql: true
+-    show-sql: true
++        jdbc:
++          time_zone: UTC
++  flyway:
++    enabled: true
++
++management:
++  endpoints:
++    web:
++      exposure:
++        include: health,info,metrics,prometheus
++  endpoint:
++    health:
++      probes:
++        enabled: true
+ 
+-logging:
+-  level:
+-    root: INFO
+\ No newline at end of file
++tracing:
++  otlp:
++    endpoint: 
+diff --git a/src/main/resources/db/migration/V1__baseline.sql b/src/main/resources/db/migration/V1__baseline.sql
+new file mode 100644
+index 0000000..a00f755
+--- /dev/null
++++ b/src/main/resources/db/migration/V1__baseline.sql
+@@ -0,0 +1,11 @@
++-- App: registration
++-- Package: db
++-- File: V1__baseline.sql
++-- Version: 0.1.0
++-- Turns: 2
++-- Author: Bobwares
++-- Date: 2025-09-11T08:54:27Z
++-- Description: Create application schema.
++
++-- If you use a dedicated schema, create it here:
++-- CREATE SCHEMA IF NOT EXISTS app AUTHORIZATION ;
+diff --git a/src/main/resources/db/migration/V2__customer_tables.sql b/src/main/resources/db/migration/V2__customer_tables.sql
+new file mode 100644
+index 0000000..59781b8
+--- /dev/null
++++ b/src/main/resources/db/migration/V2__customer_tables.sql
+@@ -0,0 +1,53 @@
++-- App: registration
++-- Package: db
++-- File: V2__customer_tables.sql
++-- Version: 0.1.0
++-- Turns: 2
++-- Author: Bobwares
++-- Date: 2025-09-11T08:54:27Z
++-- Description: Customer domain tables and indexes.
++
++CREATE TABLE IF NOT EXISTS postal_address (
++  address_id  SERIAL PRIMARY KEY,
++  line1       VARCHAR(255) NOT NULL,
++  line2       VARCHAR(255),
++  city        VARCHAR(100) NOT NULL,
++  state       VARCHAR(50)  NOT NULL,
++  postal_code VARCHAR(20),
++  country     CHAR(2)      NOT NULL
++);
++
++CREATE TABLE IF NOT EXISTS privacy_settings (
++  privacy_settings_id SERIAL PRIMARY KEY,
++  marketing_emails_enabled BOOLEAN NOT NULL,
++  two_factor_enabled       BOOLEAN NOT NULL
++);
++
++CREATE TABLE IF NOT EXISTS customer (
++  customer_id         UUID PRIMARY KEY,
++  first_name          VARCHAR(255) NOT NULL,
++  middle_name         VARCHAR(255),
++  last_name           VARCHAR(255) NOT NULL,
++  address_id          INT REFERENCES postal_address(address_id),
++  privacy_settings_id INT REFERENCES privacy_settings(privacy_settings_id)
++);
++
++CREATE INDEX IF NOT EXISTS idx_customer_address_id ON customer (address_id);
++CREATE INDEX IF NOT EXISTS idx_customer_privacy_settings_id ON customer (privacy_settings_id);
++
++CREATE TABLE IF NOT EXISTS customer_email (
++  email_id    SERIAL PRIMARY KEY,
++  customer_id UUID NOT NULL REFERENCES customer(customer_id) ON DELETE CASCADE,
++  email       VARCHAR(255) NOT NULL,
++  UNIQUE (customer_id, email)
++);
++CREATE INDEX IF NOT EXISTS idx_customer_email_customer_id ON customer_email (customer_id);
++
++CREATE TABLE IF NOT EXISTS customer_phone_number (
++  phone_id    SERIAL PRIMARY KEY,
++  customer_id UUID NOT NULL REFERENCES customer(customer_id) ON DELETE CASCADE,
++  type        VARCHAR(20) NOT NULL,
++  number      VARCHAR(15) NOT NULL,
++  UNIQUE (customer_id, number)
++);
++CREATE INDEX IF NOT EXISTS idx_customer_phone_customer_id ON customer_phone_number (customer_id);
+diff --git a/src/test/java/com/bobwares/customer/registration/CustomerControllerIT.java b/src/test/java/com/bobwares/customer/registration/CustomerControllerIT.java
+new file mode 100644
+index 0000000..73d0c18
+--- /dev/null
++++ b/src/test/java/com/bobwares/customer/registration/CustomerControllerIT.java
+@@ -0,0 +1,39 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: CustomerControllerIT.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: CustomerControllerIT
++ * Description: Integration tests for CRUD controller using Testcontainers Postgres.
++ */
++package com.bobwares.customer.registration;
++
++import org.junit.jupiter.api.BeforeAll;
++import org.junit.jupiter.api.Test;
++import org.springframework.boot.test.context.SpringBootTest;
++import org.springframework.boot.test.web.server.LocalServerPort;
++import org.springframework.http.HttpStatus;
++import org.springframework.web.client.RestClient;
++
++import static org.assertj.core.api.Assertions.assertThat;
++
++@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
++class CustomerControllerIT {
++
++  @LocalServerPort int port;
++
++  @BeforeAll
++  static void init() {
++    PostgresTestContainer.class.getName();
++  }
++
++  @Test
++  void health_check() {
++    var client = RestClient.builder().baseUrl("http://localhost:" + port).build();
++    var status = client.get().uri("/actuator/health").retrieve().toBodilessEntity().getStatusCode();
++    assertThat(status).isEqualTo(HttpStatus.OK);
++  }
++}
+diff --git a/src/test/java/com/bobwares/customer/registration/PostgresTestContainer.java b/src/test/java/com/bobwares/customer/registration/PostgresTestContainer.java
+new file mode 100644
+index 0000000..9ec1f48
+--- /dev/null
++++ b/src/test/java/com/bobwares/customer/registration/PostgresTestContainer.java
+@@ -0,0 +1,31 @@
++/**
++ * App: registration
++ * Package: com.bobwares.customer.registration
++ * File: PostgresTestContainer.java
++ * Version: 0.1.1
++ * Turns: 2
++ * Author: Bobwares
++ * Date: 2025-09-11T08:54:27Z
++ * Exports: PostgresTestContainer
++ * Description: Singleton Postgres container for integration tests.
++ */
++package com.bobwares.customer.registration;
++
++import org.testcontainers.containers.PostgreSQLContainer;
++
++public final class PostgresTestContainer {
++  private static final PostgreSQLContainer<?> POSTGRES =
++      new PostgreSQLContainer<>("postgres:16-alpine")
++          .withDatabaseName("app")
++          .withUsername("admin")
++          .withPassword("abc123");
++
++  static {
++    POSTGRES.start();
++    System.setProperty("spring.datasource.url", POSTGRES.getJdbcUrl());
++    System.setProperty("spring.datasource.username", POSTGRES.getUsername());
++    System.setProperty("spring.datasource.password", POSTGRES.getPassword());
++  }
++
++  private PostgresTestContainer() {}
++}
+diff --git a/src/test/resources/application-test.yml b/src/test/resources/application-test.yml
+new file mode 100644
+index 0000000..c4e268e
+--- /dev/null
++++ b/src/test/resources/application-test.yml
+@@ -0,0 +1,16 @@
++####################################################################################################
++# App: registration
++# Package: com.bobwares.customer.registration
++# File: application-test.yml
++# Version: 0.1.0
++# Turns: 2
++# Author: Bobwares
++# Date: 2025-09-11T08:54:27Z
++# Exports: spring.jpa.hibernate.ddl-auto
++# Description: Test profile configuration for integration tests.
++####################################################################################################
++
++spring:
++  jpa:
++    hibernate:
++      ddl-auto: validate

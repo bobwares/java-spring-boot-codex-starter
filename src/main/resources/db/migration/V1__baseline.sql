@@ -1,0 +1,11 @@
+-- App: registration
+-- Package: db
+-- File: V1__baseline.sql
+-- Version: 0.1.0
+-- Turns: 2
+-- Author: Bobwares
+-- Date: 2025-09-11T08:54:27Z
+-- Description: Create application schema.
+
+-- If you use a dedicated schema, create it here:
+-- CREATE SCHEMA IF NOT EXISTS app AUTHORIZATION ;
