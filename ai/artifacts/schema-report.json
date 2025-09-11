@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "title": "CustomerProfile",
+  "fields": {
+    "id": "string(uuid)",
+    "firstName": "string",
+    "middleName": "string",
+    "lastName": "string",
+    "emails": "array[string]",
+    "phoneNumbers": "array[PhoneNumber]",
+    "address": "PostalAddress",
+    "privacySettings": "PrivacySettings"
+  }
+}

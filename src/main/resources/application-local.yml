@@ -1,16 +1,27 @@
 ####################################################################################################
-# App: Customer Registration Service
-# Package: configuration
+# App: registration
+# Package: com.bobwares.customer
 # File: application-local.yml
-# Version: 0.1.0
+# Version: 0.1.1
 # Turns: 2
-# Author: AI
-# Date: 2025-09-08T05:07:24Z
-# Exports: spring.datasource.username, spring.datasource.password
-# Description: Local profile overrides using environment variables for DB credentials.
+# Author: Bobwares
+# Date: 2025-09-11T08:54:27Z
+# Exports: spring.datasource.url, spring.datasource.username, spring.datasource.password, spring.jpa.properties.hibernate.default_schema
+# Description: Local profile configuration for Postgres via docker-compose.
 ####################################################################################################
 
 spring:
   datasource:
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:/
+    username: 
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: 
+
+logging:
+  level:
+    root: INFO

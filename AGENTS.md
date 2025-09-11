@@ -121,3 +121,9 @@ List the trade-offs and implications (positive and negative).
 ```
 
 
+
+# Patterns
+
+- Pattern: Spring REST + JPA (Sync)
+  - Task: project_root/ai/agentic-pipeline/tasks/initialize_pattern_spring_rest_jpa.task.md
+  - Required tools (in order): maven-apply_dependencies → spring-boot-apply_configuration → schema-lint_and_normalize → db-json_schema_to_sql_ddl → flyway-baseline_and_migration → persistence-generate_persistence_code → rest-generate_rest_api → problem-json-error_handling → testcontainers-setup_postgres → micrometer-otel-setup → e2e-http_scenario → ci-validate_turn

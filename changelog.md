@@ -30,3 +30,14 @@ Add Person CRUD service
 - Implement asynchronous Person CRUD API with WebFlux and OpenAPI.
 - Add unit and integration tests for Person service and controller.
 - Provide end-to-end HTTP scenario for Person lifecycle.
+
+### 0.0.4 – 2025-09-11T08:54:27Z (work)
+
+#### Task
+Initialize Spring REST + JPA pattern
+
+#### Changes
+- Add task and tool specifications for Spring REST + JPA pattern.
+- Implement Customer domain with JPA, REST controller, and service.
+- Configure Spring Boot, Flyway migrations, Testcontainers, and tracing.
+- Add CI workflow and E2E HTTP scenario.

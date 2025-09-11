@@ -1,0 +1,46 @@
+####################################################################################################
+# App: registration
+# Package: com.bobwares.customer.registration
+# File: Customer.http
+# Version: 0.1.0
+# Turns: 2
+# Author: Bobwares
+# Date: 2025-09-11T08:54:27Z
+# Exports: create, get, update, delete, verify 404
+# Description: End-to-end CRUD flow.
+####################################################################################################
+
+@host = http://localhost:{{PORT:8080}}
+
+### Create
+POST {{host}}/api/customers
+Content-Type: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Smith",
+  "emails": ["alice@example.com"],
+  "privacySettings": {"marketingEmailsEnabled": true, "twoFactorEnabled": false}
+}
+
+> {% client.global.set("id", response.body.id); %}
+
+### Get
+GET {{host}}/api/customers/{{id}}
+
+### Update
+PUT {{host}}/api/customers/{{id}}
+Content-Type: application/json
+
+{
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "emails": ["alice@example.com"],
+  "privacySettings": {"marketingEmailsEnabled": true, "twoFactorEnabled": true}
+}
+
+### Delete
+DELETE {{host}}/api/customers/{{id}}
+
+### Verify 404
+GET {{host}}/api/customers/{{id}}

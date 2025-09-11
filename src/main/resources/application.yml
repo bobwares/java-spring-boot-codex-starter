@@ -1,32 +1,40 @@
 ####################################################################################################
-# App: Customer Registration Service
-# Package: configuration
+# App: registration
+# Package: com.bobwares.customer
 # File: application.yml
-# Version: 0.1.1
+# Version: 0.1.2
 # Turns: 2
-# Author: AI
-# Date: 2025-09-08T05:07:24Z
-# Exports: spring.application.name, spring.datasource.url, spring.jpa.hibernate.ddl-auto, logging.level.root
-# Description: Base application configuration with Postgres datasource and logging settings.
+# Author: Bobwares
+# Date: 2025-09-11T08:54:27Z
+# Exports: server.port, spring.jpa.open-in-view, spring.flyway.enabled, management.endpoints.web.exposure.include, tracing.otlp.endpoint
+# Description: Base application configuration for all profiles.
 ####################################################################################################
+
+server:
+  port: ${APP_PORT:8080} 
 
 spring:
   application:
-    name: ${COMPOSE_PROJECT_NAME:${project_name:customer-registration-service}}
-
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:app}
-    driver-class-name: org.postgresql.Driver
-
+    name: registration
   jpa:
-    hibernate:
-      ddl-auto: update
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: true
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
 
-logging:
-  level:
-    root: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+tracing:
+  otlp:
+    endpoint: 

@@ -1,0 +1,10 @@
+{
+  "id": "id",
+  "firstName": "first_name",
+  "middleName": "middle_name",
+  "lastName": "last_name",
+  "emails": "emails",
+  "phoneNumbers": "phone_numbers",
+  "address": "address",
+  "privacySettings": "privacy_settings"
+}
