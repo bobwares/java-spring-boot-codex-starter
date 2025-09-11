@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ai-append.sh - Version 1.2
+# ai-append.sh - Version 1.4
 # Concatenate AI workspace files into ./ai/project-parser/output/ai-files.md
 
 set -euo pipefail
@@ -7,11 +7,13 @@ set -euo pipefail
 # Directories relative to ./ai/project-parser
 BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 AI_DIR="$BASE_DIR/.."
+PROJECT_ROOT="$(cd "$AI_DIR/.." && pwd -P)"
 OUTPUT_DIR="$BASE_DIR/output"
 OUTPUT_FILE="$OUTPUT_DIR/ai-files.md"
 
 echo "BASE_DIR=$BASE_DIR"
 echo "AI_DIR=$AI_DIR"
+echo "PROJECT_ROOT=$PROJECT_ROOT"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
 echo "OUTPUT_FILE=$OUTPUT_FILE"
 
@@ -37,6 +39,7 @@ EXCLUDE_DIRS=(
   "$AI_DIR/.pytest_cache"
   "$AI_DIR/.venv"
   "$AI_DIR/project-parser"
+  "$AI_DIR/vibe"
 )
 
 INCLUDE_GLOBS=(
@@ -59,7 +62,8 @@ BINARY_GLOBS=(
 
 lang_for() {
   local f="$1"
-  local base="$(basename "$f")"
+  local base
+  base="$(basename "$f")"
   local ext="${base##*.}"
   if [[ "$base" == *.prompt.md ]]; then echo "markdown"; return; fi
   case "$ext" in
@@ -101,7 +105,7 @@ find "$AI_DIR" \
   ! \( "${BINARY_EXPR[@]}" \) \
   -print0 |
 sort -z | while IFS= read -r -d '' file; do
-  rel="./${file#"$AI_DIR/../"}"
+  rel="./${file#"$PROJECT_ROOT/"}"
   lang=$(lang_for "$file")
 
   printf 'Processing: %s\n' "$rel" 1>&2
@@ -116,5 +120,35 @@ sort -z | while IFS= read -r -d '' file; do
     echo
   } >> "$OUTPUT_FILE"
 done
+
+# Then explicitly add AGENTS.md from project root if it exists
+AGENTS_FILE="$PROJECT_ROOT/AGENTS.md"
+if [[ -f "$AGENTS_FILE" ]]; then
+  rel="project_root/AGENTS.md"
+  lang="markdown"
+  printf 'Processing: %s\n' "$rel" 1>&2
+  {
+    echo "## File: $rel"
+    echo
+    echo "\`\`\`$lang"
+    cat "$AGENTS_FILE"
+    echo
+    echo "\`\`\`"
+    echo
+  } >> "$OUTPUT_FILE"
+fi
+
+# Cross-platform sed -i
+sedi() {
+  if sed --version >/dev/null 2>&1; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
+# Post-process output paths:
+# Replace ".//Users/bobware/projects/0-codex-starters/java-spring-boot-codex-starter/" with "project_root/"
+sedi 's#\.//Users/bobware/projects/0-codex-starters/java-spring-boot-codex-starter/#project_root/#g' "$OUTPUT_FILE"
 
 echo "Wrote $(wc -l < "$OUTPUT_FILE") lines to $OUTPUT_FILE"

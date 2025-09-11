@@ -8,7 +8,7 @@ open and read file project_root/ai/agentic-pipeline/context/Turns_Technical_Desi
 
 # Tech Stack
 
-open and read file project_root/ai/agentic-pipeline/context/Turns_Technical_Design.md
+open and read file project_root/ai/agentic-pipeline/context/tech-stack.md
 
 # Coding Standards
 
