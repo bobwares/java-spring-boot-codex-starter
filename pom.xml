@@ -7,11 +7,11 @@
         <version>3.5.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.bobwares</groupId>
-    <artifactId>common</artifactId>
+    <groupId>com.bobwares.customer</groupId>
+    <artifactId>registration</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>common</name>
-    <description>Codex Java Spring Starter</description>
+    <name>Customer Registration</name>
+    <description>Spring Boot service for managing customer registrations</description>
     <properties>
         <java.version>21</java.version>
         <spring.boot.version>3.5.5</spring.boot.version>
@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
         <dependency>
@@ -73,11 +73,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
